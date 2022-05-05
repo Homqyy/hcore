@@ -24,7 +24,8 @@
 		"Gruntfuggly.todo-tree",
 		"eamodio.gitlens",
 		"cschlosser.doxdocgen",
-		"oderwat.indent-rainbow"
+		"oderwat.indent-rainbow",
+		"jeff-hykin.better-cpp-syntax"
 	]
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
