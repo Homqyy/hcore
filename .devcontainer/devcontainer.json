@@ -22,7 +22,9 @@
 		"ms-vscode.cmake-tools",
 		"christian-kohler.path-intellisense",
 		"Gruntfuggly.todo-tree",
-		"eamodio.gitlens"
+		"eamodio.gitlens",
+		"cschlosser.doxdocgen",
+		"oderwat.indent-rainbow"
 	]
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
