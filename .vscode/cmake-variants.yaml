@@ -1,0 +1,14 @@
+buildType:
+    default: debug
+    description: My option
+    choices:
+        debug:
+            short: Debug
+            long: Build with debugging information
+            buildType: Debug
+            linkage: shared
+        release:
+            short: Release
+            long: Optimize the resulting binaries
+            buildType: Release
+            linkage: shared
