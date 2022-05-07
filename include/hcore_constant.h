@@ -25,11 +25,11 @@
 #define IOV_MAX 16
 #endif
 
-#define HCORE_SUCCESSED 0
-#define HCORE_FAILED    -1
-#define HCORE_AGAIN     -2
-#define HCORE_DONE      -3
-#define HCORE_DECLINED  -4
+#define HCORE_OK       0
+#define HCORE_ERROR    -1
+#define HCORE_AGAIN    -2
+#define HCORE_DONE     -3
+#define HCORE_DECLINED -4
 
 #define HCORE_BOOL_INVALID 2
 #define HCORE_BOOL_FALSE   0
@@ -45,7 +45,6 @@
 #define HCORE_ALIGNMENT HCORE_MACHINE_ALIGN
 
 #define HCORE_INFINITE (0xFFFFFFFF)
-
 
 #define HCORE_INT32_LEN (sizeof("-2147483648") - 1)
 #define HCORE_INT64_LEN (sizeof("-9223372036854775808") - 1)
