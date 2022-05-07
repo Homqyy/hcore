@@ -54,7 +54,7 @@ install(DIRECTORY include/
     FILES_MATCHING PATTERN "*.h")
 
 install(EXPORT HCORE_ARCHIVE
-    FILE HCoreArchive.cmake
+    FILE hcore.cmake
     DESTINATION lib/cmake/hcore)
 
 ## install the configuration file
