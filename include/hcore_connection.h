@@ -22,7 +22,7 @@
 #include <hcore_pool.h>
 #include <hcore_string.h>
 
-#define HCORE_CHAIN_ERROR (hcore_chain_t *)HCORE_FAILED
+#define HCORE_CHAIN_ERROR (hcore_chain_t *)HCORE_ERROR
 
 typedef struct hcore_connection_s hcore_connection_t;
 
