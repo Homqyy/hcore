@@ -49,8 +49,8 @@ struct hcore_list_s
  * @param  list: 待初始化的链表结构
  * @param  compare: 链表的比较函数，其影响排序顺序
  * @retval
- * 初始化成功：HCORE_SUCCESSED
- * 初始化失败：HCORE_FAILED
+ * 初始化成功：HCORE_OK
+ * 初始化失败：HCORE_ERROR
  */
 hcore_int_t hcore_list_init(hcore_pool_t *pool, hcore_list_t *list,
                         hcore_list_compare_pt compare);

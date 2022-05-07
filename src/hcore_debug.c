@@ -187,7 +187,7 @@ hcore_debug_create_mnode(const char *name, size_t size)
             hcore_bug_on();
         }
 
-        if (hcore_list_insert(db->mlist, node) != HCORE_SUCCESSED) goto error;
+        if (hcore_list_insert(db->mlist, node) != HCORE_OK) goto error;
 
         node->debug = 1;
 

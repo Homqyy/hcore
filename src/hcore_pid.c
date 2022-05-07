@@ -26,10 +26,10 @@ hcore_create_pidfile(const char *pidfile, pid_t pid)
 
     hcore_assert(pidfile);
 
-    if (pidfile == NULL) return HCORE_FAILED;
+    if (pidfile == NULL) return HCORE_ERROR;
 
     fp = fopen(pidfile, "w+");
-    if (fp == NULL) return HCORE_FAILED;
+    if (fp == NULL) return HCORE_ERROR;
 
     fprintf(fp, "%d", pid);
 
@@ -48,7 +48,7 @@ hcore_proc_is_running(const char *pidfile)
     if (access(pidfile, F_OK) == 0)
     {
         pid_t pid = hcore_get_pid(pidfile);
-        if (pid == HCORE_FAILED) return 0;
+        if (pid == HCORE_ERROR) return 0;
 
         return kill(pid, 0) == 0;
     }
@@ -64,15 +64,15 @@ hcore_get_pid(const char *pidfile)
 
     hcore_assert(pidfile);
 
-    if (pidfile == NULL) return HCORE_FAILED;
+    if (pidfile == NULL) return HCORE_ERROR;
 
     fp = fopen(pidfile, "r");
-    if (fp == NULL) return HCORE_FAILED;
+    if (fp == NULL) return HCORE_ERROR;
 
     if (fscanf(fp, "%d", &pid) != 1)
     {
         fclose(fp);
-        return HCORE_FAILED;
+        return HCORE_ERROR;
     }
 
     fclose(fp);

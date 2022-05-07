@@ -119,8 +119,8 @@ void hcore_pack_destroy(hcore_pack_t *p);
  * @param  *last: buffer的末尾
  * @param  *pack: 用来存放解析结果的PACK结构
  * @retval
- * 添加成功：HCORE_SUCCESSED
- * 添加失败：HCORE_FAILED
+ * 添加成功：HCORE_OK
+ * 添加失败：HCORE_ERROR
  */
 ssize_t hcore_pack_read(const hcore_uchar_t *buffer, const hcore_uchar_t *last,
                       hcore_pack_t *pack);
@@ -133,8 +133,8 @@ ssize_t hcore_pack_read(const hcore_uchar_t *buffer, const hcore_uchar_t *last,
  * @param  *pack:
  * @param  *size:
  * @retval
- * 添加成功：HCORE_SUCCESSED
- * 添加失败：HCORE_FAILED
+ * 添加成功：HCORE_OK
+ * 添加失败：HCORE_ERROR
  */
 hcore_uchar_t *hcore_pack_write(hcore_pack_t *pack, size_t *size);
 
@@ -145,8 +145,8 @@ hcore_uchar_t *hcore_pack_write(hcore_pack_t *pack, size_t *size);
  * @param  *name:
  * @param  i:
  * @retval
- * 添加成功：HCORE_SUCCESSED
- * 添加失败：HCORE_FAILED
+ * 添加成功：HCORE_OK
+ * 添加失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_add_int(hcore_pack_t *p, const char *name, unsigned int i);
 
@@ -157,8 +157,8 @@ hcore_int_t hcore_pack_add_int(hcore_pack_t *p, const char *name, unsigned int i
  * @param  *name:
  * @param  *str:
  * @retval
- * 添加成功：HCORE_SUCCESSED
- * 添加失败：HCORE_FAILED
+ * 添加成功：HCORE_OK
+ * 添加失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_add_str(hcore_pack_t *p, const char *name,
                            const hcore_str_t *str);
@@ -170,8 +170,8 @@ hcore_int_t hcore_pack_add_str(hcore_pack_t *p, const char *name,
  * @param  *name:
  * @param  *str:
  * @retval
- * 添加成功：HCORE_SUCCESSED
- * 添加失败：HCORE_FAILED
+ * 添加成功：HCORE_OK
+ * 添加失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_add_str_char(hcore_pack_t *p, const char *name,
                                 const char *str);
@@ -184,8 +184,8 @@ hcore_int_t hcore_pack_add_str_char(hcore_pack_t *p, const char *name,
  * @param  *data:
  * @param  size:
  * @retval
- * 添加成功：HCORE_SUCCESSED
- * 添加失败：HCORE_FAILED
+ * 添加成功：HCORE_OK
+ * 添加失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_add_data(hcore_pack_t *p, const char *name, const void *data,
                             size_t size);
@@ -197,8 +197,8 @@ hcore_int_t hcore_pack_add_data(hcore_pack_t *p, const char *name, const void *d
  * @param  *name:
  * @param  *i:
  * @retval
- * 获取成功：HCORE_SUCCESSED
- * 获取失败：HCORE_FAILED
+ * 获取成功：HCORE_OK
+ * 获取失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_get_int(hcore_pack_t *p, const char *name, unsigned int *i);
 
@@ -212,8 +212,8 @@ hcore_int_t hcore_pack_get_int(hcore_pack_t *p, const char *name, unsigned int *
  * @param  **i:
  * @param  *num:
  * @retval
- * 获取成功：HCORE_SUCCESSED
- * 获取失败：HCORE_FAILED
+ * 获取成功：HCORE_OK
+ * 获取失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_get_int_array(hcore_pack_t *p, const char *name,
                                  unsigned int **i, hcore_uint_t *num);
@@ -225,8 +225,8 @@ hcore_int_t hcore_pack_get_int_array(hcore_pack_t *p, const char *name,
  * @param  *name:
  * @param  *str:
  * @retval
- * 获取成功：HCORE_SUCCESSED
- * 获取失败：HCORE_FAILED
+ * 获取成功：HCORE_OK
+ * 获取失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_get_str(hcore_pack_t *p, const char *name, hcore_str_t *str);
 
@@ -240,8 +240,8 @@ hcore_int_t hcore_pack_get_str(hcore_pack_t *p, const char *name, hcore_str_t *s
  * @param  **i:
  * @param  *num:
  * @retval
- * 获取成功：HCORE_SUCCESSED
- * 获取失败：HCORE_FAILED
+ * 获取成功：HCORE_OK
+ * 获取失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_get_str_array(hcore_pack_t *p, const char *name,
                                  hcore_str_t **str, hcore_uint_t *num);
@@ -254,8 +254,8 @@ hcore_int_t hcore_pack_get_str_array(hcore_pack_t *p, const char *name,
  * @param  *name:
  * @param  *str:
  * @retval
- * 获取成功：HCORE_SUCCESSED
- * 获取失败：HCORE_FAILED
+ * 获取成功：HCORE_OK
+ * 获取失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_get_data(hcore_pack_t *p, const char *name, void **data,
                             size_t *size);
@@ -270,8 +270,8 @@ hcore_int_t hcore_pack_get_data(hcore_pack_t *p, const char *name, void **data,
  * @param  **data:
  * @param  *size:
  * @retval
- * 获取成功：HCORE_SUCCESSED
- * 获取失败：HCORE_FAILED
+ * 获取成功：HCORE_OK
+ * 获取失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_get_data_array(hcore_pack_t *p, const char *name,
                                   hcore_pack_elem_value_data_t **data,
@@ -294,13 +294,13 @@ hcore_pack_init(hcore_pack_t *p, hcore_pool_t *pool, hcore_uint_t max)
     p->pool     = pool;
     p->max      = max;
     p->elements = hcore_list_create(pool, hcore_pack_cmp_name);
-    if (p->elements == NULL) { return HCORE_FAILED; }
+    if (p->elements == NULL) { return HCORE_ERROR; }
     p->phase      = hcore_pack_phase_init;
     p->need_size  = sizeof(unsigned int);
     p->total_size = 4 /* number of element */;
     p->ref        = 1;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 /**

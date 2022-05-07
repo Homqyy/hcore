@@ -34,7 +34,7 @@ static hcore_str_t g_hcore_err_padding[] = {
 hcore_int_t
 hcore_log_parse_level(const char *log_str)
 {
-    if (log_str == NULL) { return HCORE_FAILED; }
+    if (log_str == NULL) { return HCORE_ERROR; }
 
     int i;
     int len = strlen(log_str);
@@ -48,7 +48,7 @@ hcore_log_parse_level(const char *log_str)
         }
     }
 
-    return HCORE_FAILED;
+    return HCORE_ERROR;
 }
 
 /* format:

@@ -118,7 +118,7 @@ hcore_parse_unix_sock(hcore_str_t *str, hcore_url_t *url)
     (void)str;
     (void)url;
 
-    return HCORE_FAILED;
+    return HCORE_ERROR;
 }
 
 static hcore_int_t
@@ -133,7 +133,7 @@ hcore_parse_inet_sock(hcore_str_t *str, hcore_url_t *url)
     hcore_int_t           n;
     size_t              len;
 
-    if (str->len == 0) { return HCORE_FAILED; }
+    if (str->len == 0) { return HCORE_ERROR; }
 
     url->socklen = sizeof(struct sockaddr_in);
     url->family  = AF_INET;
@@ -157,7 +157,7 @@ hcore_parse_inet_sock(hcore_str_t *str, hcore_url_t *url)
         if (n < 1 || n > 65535)
         {
             url->err = "invalid port";
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
 
         url->port     = (in_port_t)n;
@@ -175,7 +175,7 @@ hcore_parse_inet_sock(hcore_str_t *str, hcore_url_t *url)
         if (!url->listen)
         {
             url->err = "need a host";
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
 
         port = host;
@@ -183,16 +183,16 @@ hcore_parse_inet_sock(hcore_str_t *str, hcore_url_t *url)
 
         n = hcore_atoi(port, len);
 
-        if (n == HCORE_FAILED)
+        if (n == HCORE_ERROR)
         {
             url->err = "no port";
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
 
         if (n < 1 || n > 65535)
         {
             url->err = "invalid port";
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
 
         url->port            = (in_port_t)n;
@@ -203,7 +203,7 @@ hcore_parse_inet_sock(hcore_str_t *str, hcore_url_t *url)
         url->port_text.data = port;
         hcore_str_set(&url->host, "*");
 
-        return HCORE_SUCCESSED;
+        return HCORE_OK;
     }
 
     /* host */
@@ -213,7 +213,7 @@ hcore_parse_inet_sock(hcore_str_t *str, hcore_url_t *url)
     if (len == 0)
     {
         url->err = "no host";
-        return HCORE_FAILED;
+        return HCORE_ERROR;
     }
 
     url->host.data = host;
@@ -224,11 +224,11 @@ hcore_parse_inet_sock(hcore_str_t *str, hcore_url_t *url)
         if (!url->listen)
         {
             url->err = "unsupport '*' for no listen";
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
 
         sin->sin_addr.s_addr = INADDR_ANY;
-        return HCORE_SUCCESSED;
+        return HCORE_OK;
     }
 
     sin->sin_addr.s_addr = hcore_inet_addr(host, len);
@@ -236,12 +236,12 @@ hcore_parse_inet_sock(hcore_str_t *str, hcore_url_t *url)
     if (sin->sin_addr.s_addr == INADDR_NONE)
     {
         url->err = "invalid ip";
-        return HCORE_FAILED;
+        return HCORE_ERROR;
     }
 
     url->err = NULL;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 in_addr_t
@@ -328,16 +328,16 @@ hcore_parse_port_range(hcore_int_t *port_begin, hcore_int_t *port_end,
 
         ep = hcore_atoi(p, last - p);
 
-        if (ep < 1 || ep > 65535) { return HCORE_FAILED; }
+        if (ep < 1 || ep > 65535) { return HCORE_ERROR; }
 
         len = p - data - 1;
     }
 
     bp = hcore_atoi(data, len);
 
-    if (bp < 1 || bp > 65535) { return HCORE_FAILED; }
+    if (bp < 1 || bp > 65535) { return HCORE_ERROR; }
 
-    if (ep != -1 && bp > ep) { return HCORE_FAILED; }
+    if (ep != -1 && bp > ep) { return HCORE_ERROR; }
     else if (ep == -1)
     {
         ep = bp;
@@ -346,7 +346,7 @@ hcore_parse_port_range(hcore_int_t *port_begin, hcore_int_t *port_end,
     *port_begin = bp;
     *port_end   = ep;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -361,7 +361,7 @@ hcore_parse_ip_and_mask(in_addr_t *ip, in_addr_t *mask, hcore_uchar_t *data,
     last = data + len;
     p    = hcore_strlchr(data, last, '/');
 
-    if (p == NULL) { return HCORE_FAILED; }
+    if (p == NULL) { return HCORE_ERROR; }
 
     ip_len = p - data;
 
@@ -369,12 +369,12 @@ hcore_parse_ip_and_mask(in_addr_t *ip, in_addr_t *mask, hcore_uchar_t *data,
 
     mask_len = last - p;
 
-    if (HCORE_INET_ADDRSTRLEN < ip_len) { return HCORE_FAILED; }
+    if (HCORE_INET_ADDRSTRLEN < ip_len) { return HCORE_ERROR; }
 
-    if (HCORE_INET_ADDRSTRLEN < mask_len) { return HCORE_FAILED; }
+    if (HCORE_INET_ADDRSTRLEN < mask_len) { return HCORE_ERROR; }
 
     inet_ip = hcore_inet_addr(data, ip_len);
-    if (inet_ip == INADDR_NONE) { return HCORE_FAILED; }
+    if (inet_ip == INADDR_NONE) { return HCORE_ERROR; }
 
     if (mask_len == HCORE_INET_ADDRSTRLEN
         && hcore_memcmp(p, "255.255.255.255", mask_len) == 0)
@@ -384,18 +384,18 @@ hcore_parse_ip_and_mask(in_addr_t *ip, in_addr_t *mask, hcore_uchar_t *data,
     else
     {
         inet_mask = hcore_inet_addr(p, mask_len);
-        if (inet_mask == INADDR_NONE) { return HCORE_FAILED; }
+        if (inet_mask == INADDR_NONE) { return HCORE_ERROR; }
 
-        if (hcore_check_mask(&inet_mask, 4) != HCORE_SUCCESSED)
+        if (hcore_check_mask(&inet_mask, 4) != HCORE_OK)
         {
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
     }
 
     *ip   = inet_ip;
     *mask = inet_mask;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -416,7 +416,7 @@ hcore_check_mask(void *data, size_t len)
         {
             if ((bytes[i] & (1 << bit)) != check_value)
             {
-                if (err) { return HCORE_FAILED; }
+                if (err) { return HCORE_ERROR; }
 
                 err         = 1; // must it is all 0
                 check_value = 0; // checking series 0 to last
@@ -424,7 +424,7 @@ hcore_check_mask(void *data, size_t len)
         }
     }
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -438,7 +438,7 @@ hcore_parse_mac_and_mask(hcore_uchar_t mac[6], hcore_uchar_t mask[6],
     last = data + len;
     p    = hcore_strlchr(data, last, '/');
 
-    if (p == NULL) { return HCORE_FAILED; }
+    if (p == NULL) { return HCORE_ERROR; }
 
     mac_len = p - data;
 
@@ -446,23 +446,23 @@ hcore_parse_mac_and_mask(hcore_uchar_t mac[6], hcore_uchar_t mask[6],
 
     mask_len = last - p;
 
-    if (mac_len != HCORE_MAC_ADDRESS_STRLEN) { return HCORE_FAILED; }
+    if (mac_len != HCORE_MAC_ADDRESS_STRLEN) { return HCORE_ERROR; }
 
-    if (mask_len != HCORE_MAC_ADDRESS_STRLEN) { return HCORE_FAILED; }
+    if (mask_len != HCORE_MAC_ADDRESS_STRLEN) { return HCORE_ERROR; }
 
-    if (hcore_parse_mac(mac, data, mac_len) != HCORE_SUCCESSED)
+    if (hcore_parse_mac(mac, data, mac_len) != HCORE_OK)
     {
-        return HCORE_FAILED;
+        return HCORE_ERROR;
     }
 
-    if (hcore_parse_mac(mask, p, mask_len) != HCORE_SUCCESSED)
+    if (hcore_parse_mac(mask, p, mask_len) != HCORE_OK)
     {
-        return HCORE_FAILED;
+        return HCORE_ERROR;
     }
 
-    if (hcore_check_mask(mask, 6) != HCORE_SUCCESSED) { return HCORE_FAILED; }
+    if (hcore_check_mask(mask, 6) != HCORE_OK) { return HCORE_ERROR; }
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -481,7 +481,7 @@ hcore_parse_mac(hcore_uchar_t mac[6], hcore_uchar_t *data, size_t len)
 
     while (p < last)
     {
-        if (i == 6) { return HCORE_FAILED; }
+        if (i == 6) { return HCORE_ERROR; }
 
         if (sep)
         {
@@ -492,12 +492,12 @@ hcore_parse_mac(hcore_uchar_t mac[6], hcore_uchar_t *data, size_t len)
                 continue;
             }
 
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
 
         value = hcore_hextoi(p, 2);
 
-        if (value == HCORE_FAILED) { return HCORE_FAILED; }
+        if (value == HCORE_ERROR) { return HCORE_ERROR; }
 
         mac[i++] = (hcore_uchar_t)value;
 
@@ -505,7 +505,7 @@ hcore_parse_mac(hcore_uchar_t mac[6], hcore_uchar_t *data, size_t len)
         p += 2;
     }
 
-    if (i != 6) { return HCORE_FAILED; }
+    if (i != 6) { return HCORE_ERROR; }
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }

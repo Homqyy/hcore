@@ -23,7 +23,7 @@ hcore_array_create(hcore_pool_t *p, hcore_uint_t n, size_t size)
     a = hcore_palloc(p, sizeof(hcore_array_t));
     if (a == NULL) { return NULL; }
 
-    if (hcore_array_init(a, p, n, size) != HCORE_SUCCESSED) { return NULL; }
+    if (hcore_array_init(a, p, n, size) != HCORE_OK) { return NULL; }
 
     return a;
 }

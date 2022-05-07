@@ -21,9 +21,9 @@
 
 typedef struct
 {
-    void *      elts;
+    void         *elts;
     hcore_uint_t  nelts;
-    size_t      size;
+    size_t        size;
     hcore_uint_t  nalloc;
     hcore_pool_t *pool;
 } hcore_array_t;
@@ -81,7 +81,8 @@ void *hcore_array_push_n(hcore_array_t *a, hcore_uint_t n);
  * @retval
  */
 static inline hcore_int_t
-hcore_array_init(hcore_array_t *array, hcore_pool_t *pool, hcore_uint_t n, size_t size)
+hcore_array_init(hcore_array_t *array, hcore_pool_t *pool, hcore_uint_t n,
+                 size_t size)
 {
     /*
      * set "array->nelts" before "array->elts", otherwise MSVC thinks
@@ -93,9 +94,9 @@ hcore_array_init(hcore_array_t *array, hcore_pool_t *pool, hcore_uint_t n, size_
     array->pool   = pool;
 
     array->elts = hcore_palloc(pool, n * size);
-    if (array->elts == NULL) { return HCORE_FAILED; }
+    if (array->elts == NULL) { return HCORE_ERROR; }
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 #endif // !_HCORE_ARRAY_H_INCLUDED_

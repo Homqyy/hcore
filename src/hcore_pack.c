@@ -209,7 +209,7 @@ hcore_pack_read(const hcore_uchar_t *buffer, const hcore_uchar_t *last,
                 if (pack->cur_elem == NULL) { return -1; }
 
                 if (hcore_list_insert(pack->elements, pack->cur_elem)
-                    != HCORE_SUCCESSED)
+                    != HCORE_OK)
                 {
                     return -1;
                 }
@@ -239,7 +239,7 @@ hcore_pack_read(const hcore_uchar_t *buffer, const hcore_uchar_t *last,
                 pack->cur_value_num++;
 
                 if (hcore_pack_elem_add_int(pack->cur_elem, &value_i)
-                    != HCORE_SUCCESSED)
+                    != HCORE_OK)
                 {
                     return -1;
                 }
@@ -281,7 +281,7 @@ hcore_pack_read(const hcore_uchar_t *buffer, const hcore_uchar_t *last,
                     v_str.len  = pack->value_len;
                     v_str.data = (hcore_uchar_t *)p;
                     if (hcore_pack_elem_add_str(pack->cur_elem, &v_str)
-                        != HCORE_SUCCESSED)
+                        != HCORE_OK)
                     {
                         return -1;
                     }
@@ -290,7 +290,7 @@ hcore_pack_read(const hcore_uchar_t *buffer, const hcore_uchar_t *last,
                 {
                     if (hcore_pack_elem_add_data(pack->cur_elem, p,
                                                pack->value_len)
-                        != HCORE_SUCCESSED)
+                        != HCORE_OK)
                     {
                         return -1;
                     }
@@ -334,15 +334,15 @@ hcore_pack_elem_add_data(hcore_pack_elem_t *e, const void *data, size_t size)
 
 
     v = hcore_array_push(e->values);
-    if (v == NULL) { return HCORE_FAILED; }
+    if (v == NULL) { return HCORE_ERROR; }
 
     v->data = hcore_pnalloc(e->pool, size);
-    if (v->data == NULL) { return HCORE_FAILED; }
+    if (v->data == NULL) { return HCORE_ERROR; }
 
     hcore_memcpy(v->data, data, size);
     v->size = size;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 static hcore_int_t
@@ -352,17 +352,17 @@ hcore_pack_elem_add_str(hcore_pack_elem_t *e, const hcore_str_t *str)
 
 
     v = hcore_array_push(e->values);
-    if (v == NULL) { return HCORE_FAILED; }
+    if (v == NULL) { return HCORE_ERROR; }
 
     v->data = hcore_pnalloc(e->pool, str->len + 1);
-    if (v->data == NULL) { return HCORE_FAILED; }
+    if (v->data == NULL) { return HCORE_ERROR; }
 
     v->len = hcore_snprintf(v->data, str->len, "%s", str->data) - v->data;
     v->data[v->len] = '\0';
 
     hcore_assert(v->len == str->len);
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 static hcore_int_t
@@ -371,11 +371,11 @@ hcore_pack_elem_add_int(hcore_pack_elem_t *e, const unsigned int *i)
     unsigned int *v;
 
     v = hcore_array_push(e->values);
-    if (v == NULL) { return HCORE_FAILED; }
+    if (v == NULL) { return HCORE_ERROR; }
 
     *v = *i;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 static int
@@ -403,7 +403,7 @@ hcore_pack_create(hcore_log_t *log, hcore_uint_t max)
         return NULL;
     }
 
-    if (hcore_pack_init(p, pool, max) != HCORE_SUCCESSED)
+    if (hcore_pack_init(p, pool, max) != HCORE_OK)
     {
         hcore_destroy_pool(pool);
         return NULL;
@@ -451,14 +451,14 @@ hcore_pack_get_int(hcore_pack_t *p, const char *name, unsigned int *i)
 
     *i = 0;
 
-    if (hcore_pack_get_int_array(p, name, &i_array, &num) != HCORE_SUCCESSED)
+    if (hcore_pack_get_int_array(p, name, &i_array, &num) != HCORE_OK)
     {
-        return HCORE_FAILED;
+        return HCORE_ERROR;
     }
 
     *i = i_array[0];
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -469,7 +469,7 @@ hcore_pack_get_int_array(hcore_pack_t *p, const char *name, unsigned int **i,
     hcore_str_t        name_str;
 
 
-    if (p == NULL || name == NULL || i == NULL) { return HCORE_FAILED; }
+    if (p == NULL || name == NULL || i == NULL) { return HCORE_ERROR; }
 
     *i   = NULL;
     *num = 0;
@@ -478,14 +478,14 @@ hcore_pack_get_int_array(hcore_pack_t *p, const char *name, unsigned int **i,
     name_str.len  = strlen(name);
 
     e = hcore_pack_elem_get(p, &name_str, HCORE_PACK_ELEM_TYPE_INT);
-    if (e == NULL) { return HCORE_FAILED; }
+    if (e == NULL) { return HCORE_ERROR; }
 
-    if (e->values->nelts == 0) { return HCORE_FAILED; }
+    if (e->values->nelts == 0) { return HCORE_ERROR; }
 
     *i   = e->values->elts;
     *num = e->values->nelts;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -498,14 +498,14 @@ hcore_pack_get_str(hcore_pack_t *p, const char *name, hcore_str_t *str)
 
     hcore_str_set(str, "");
 
-    if (hcore_pack_get_str_array(p, name, &str_array, &num) != HCORE_SUCCESSED)
+    if (hcore_pack_get_str_array(p, name, &str_array, &num) != HCORE_OK)
     {
-        return HCORE_FAILED;
+        return HCORE_ERROR;
     }
 
     *str = str_array[0];
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -517,7 +517,7 @@ hcore_pack_get_str_array(hcore_pack_t *p, const char *name, hcore_str_t **str,
 
 
     // Validate arguments
-    if (p == NULL || name == NULL || str == NULL) { return HCORE_FAILED; }
+    if (p == NULL || name == NULL || str == NULL) { return HCORE_ERROR; }
 
     *str = NULL;
     *num = 0;
@@ -526,14 +526,14 @@ hcore_pack_get_str_array(hcore_pack_t *p, const char *name, hcore_str_t **str,
     name_str.len  = strlen(name);
 
     e = hcore_pack_elem_get(p, &name_str, HCORE_PACK_ELEM_TYPE_STR);
-    if (e == NULL) { return HCORE_FAILED; }
+    if (e == NULL) { return HCORE_ERROR; }
 
-    if (e->values->nelts == 0) { return HCORE_FAILED; }
+    if (e->values->nelts == 0) { return HCORE_ERROR; }
 
     *str = e->values->elts;
     *num = e->values->nelts;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -547,15 +547,15 @@ hcore_pack_get_data(hcore_pack_t *p, const char *name, void **data, size_t *size
     *data = NULL;
     if (size) *size = 0;
 
-    if (hcore_pack_get_data_array(p, name, &data_array, &num) != HCORE_SUCCESSED)
+    if (hcore_pack_get_data_array(p, name, &data_array, &num) != HCORE_OK)
     {
-        return HCORE_FAILED;
+        return HCORE_ERROR;
     }
 
     *data = data_array[0].data;
     *size = data_array[0].size;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -572,14 +572,14 @@ hcore_pack_get_data_array(hcore_pack_t *p, const char *name,
     name_str.len  = strlen(name);
 
     e = hcore_pack_elem_get(p, &name_str, HCORE_PACK_ELEM_TYPE_DATA);
-    if (e == NULL) { return HCORE_FAILED; }
+    if (e == NULL) { return HCORE_ERROR; }
 
-    if (e->values->nelts == 0) { return HCORE_FAILED; }
+    if (e->values->nelts == 0) { return HCORE_ERROR; }
 
     *data = e->values->elts;
     *num  = e->values->nelts;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -588,7 +588,7 @@ hcore_pack_add_int(hcore_pack_t *p, const char *name, unsigned int i)
     // Validate arguments
     if (p == NULL || name == NULL)
     {
-        return HCORE_FAILED;
+        return HCORE_ERROR;
         ;
     }
 
@@ -599,7 +599,7 @@ hcore_int_t
 hcore_pack_add_str(hcore_pack_t *p, const char *name, const hcore_str_t *str)
 {
     // Validate arguments
-    if (p == NULL || name == NULL || str == NULL) { return HCORE_FAILED; }
+    if (p == NULL || name == NULL || str == NULL) { return HCORE_ERROR; }
 
     return hcore_pack_add_value(p, name, HCORE_PACK_ELEM_TYPE_STR, str);
 }
@@ -608,7 +608,7 @@ hcore_int_t
 hcore_pack_add_str_char(hcore_pack_t *p, const char *name, const char *str)
 {
     // Validate arguments
-    if (p == NULL || name == NULL || str == NULL) { return HCORE_FAILED; }
+    if (p == NULL || name == NULL || str == NULL) { return HCORE_ERROR; }
 
     hcore_str_t data;
 
@@ -625,7 +625,7 @@ hcore_pack_add_data(hcore_pack_t *p, const char *name, const void *data,
     hcore_pack_elem_value_data_t v_data;
 
     // Validate arguments
-    if (p == NULL || name == NULL || data == NULL) { return HCORE_FAILED; }
+    if (p == NULL || name == NULL || data == NULL) { return HCORE_ERROR; }
 
     v_data.data = (void *)data;
     v_data.size = size;
@@ -652,15 +652,15 @@ hcore_pack_add_value(hcore_pack_t *p, const char *name, hcore_pack_elem_type_e t
     {
         if (p->max && p->max <= HCORE_LIST_NUM(p->elements))
         {
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
 
         e = hcore_pack_elem_create(p->pool, &elem_name, type, 0);
-        if (e == NULL) { return HCORE_FAILED; }
+        if (e == NULL) { return HCORE_ERROR; }
 
-        if (hcore_list_insert(p->elements, e) != HCORE_SUCCESSED)
+        if (hcore_list_insert(p->elements, e) != HCORE_OK)
         {
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
 
         p->total_size += 4; /* length of element name */
@@ -703,10 +703,10 @@ hcore_pack_add_value(hcore_pack_t *p, const char *name, hcore_pack_elem_type_e t
             return hcore_pack_elem_add_data(e, data->data, data->size);
         }
 
-    default: return HCORE_FAILED;
+    default: return HCORE_ERROR;
     }
 
-    return HCORE_FAILED;
+    return HCORE_ERROR;
 }
 
 static hcore_pack_elem_t *

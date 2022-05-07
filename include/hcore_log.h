@@ -89,7 +89,7 @@ void hcore_log_error_core(int level, hcore_log_t *log, hcore_err_t err,
  * @param  *log_str:
  * @retval
  * 解析成功：返回对应的整形值，比如宏 "HCORE_LOG_ERROR"
- * 解析失败：HCORE_FAILED
+ * 解析失败：HCORE_ERROR
  */
 hcore_int_t hcore_log_parse_level(const char *log_str);
 

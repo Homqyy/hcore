@@ -18,7 +18,7 @@
 hcore_int_t
 hcore_asnprintf(hcore_astring_t *astr, const char *fmt, ...)
 {
-    if (NULL == astr) { return HCORE_FAILED; }
+    if (NULL == astr) { return HCORE_ERROR; }
 
     hcore_uchar_t *new_data;
     hcore_uchar_t *last;
@@ -42,7 +42,7 @@ hcore_asnprintf(hcore_astring_t *astr, const char *fmt, ...)
         if (NULL == new_data)
         {
             astr->error = 1;
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
 
         astr->data = new_data;
@@ -52,7 +52,7 @@ hcore_asnprintf(hcore_astring_t *astr, const char *fmt, ...)
     astr->len            = last - astr->data;
     astr->data[astr->len] = 0;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -61,7 +61,7 @@ hcore_init_astring(hcore_astring_t * astr, size_t size,
 {
     hcore_assert(astr);
 
-    if (astr == NULL) return HCORE_FAILED;
+    if (astr == NULL) return HCORE_ERROR;
 
     /* default value */
     if (size == 0) size = 64;
@@ -71,7 +71,7 @@ hcore_init_astring(hcore_astring_t * astr, size_t size,
     hcore_uchar_t *data = astr_realloc(NULL, size);
     if (data == NULL)
     {
-        return HCORE_FAILED;
+        return HCORE_ERROR;
     }
 
     astr->realloc = astr_realloc;
@@ -85,7 +85,7 @@ hcore_init_astring(hcore_astring_t * astr, size_t size,
 #ifdef _HCORE_DEBUG
     astr->inited = 1;
 #endif
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_astring_t *
@@ -98,7 +98,7 @@ hcore_create_astring(size_t size,
     hcore_astring_t *astr = astr_realloc(NULL, sizeof(hcore_astring_t));
     if (astr == NULL) return NULL;
 
-    if (hcore_init_astring(astr, size, astr_realloc, astr_free) == HCORE_FAILED)
+    if (hcore_init_astring(astr, size, astr_realloc, astr_free) == HCORE_ERROR)
     {
         astr_free(astr);
         return NULL;

@@ -185,7 +185,7 @@ hcore_parse_time(hcore_str_t *line, hcore_uint_t is_sec)
         {
             if (value >= cutoff && (value > cutoff || *p - '0' > cutlim))
             {
-                return HCORE_FAILED;
+                return HCORE_ERROR;
             }
 
             value = value * 10 + (*p++ - '0');
@@ -196,35 +196,35 @@ hcore_parse_time(hcore_str_t *line, hcore_uint_t is_sec)
         switch (*p++)
         {
         case 'y':
-            if (step > st_start) { return HCORE_FAILED; }
+            if (step > st_start) { return HCORE_ERROR; }
             step  = st_year;
             max   = HCORE_MAX_INT_T_VALUE / (60 * 60 * 24 * 365);
             scale = 60 * 60 * 24 * 365;
             break;
 
         case 'M':
-            if (step >= st_month) { return HCORE_FAILED; }
+            if (step >= st_month) { return HCORE_ERROR; }
             step  = st_month;
             max   = HCORE_MAX_INT_T_VALUE / (60 * 60 * 24 * 30);
             scale = 60 * 60 * 24 * 30;
             break;
 
         case 'w':
-            if (step >= st_week) { return HCORE_FAILED; }
+            if (step >= st_week) { return HCORE_ERROR; }
             step  = st_week;
             max   = HCORE_MAX_INT_T_VALUE / (60 * 60 * 24 * 7);
             scale = 60 * 60 * 24 * 7;
             break;
 
         case 'd':
-            if (step >= st_day) { return HCORE_FAILED; }
+            if (step >= st_day) { return HCORE_ERROR; }
             step  = st_day;
             max   = HCORE_MAX_INT_T_VALUE / (60 * 60 * 24);
             scale = 60 * 60 * 24;
             break;
 
         case 'h':
-            if (step >= st_hour) { return HCORE_FAILED; }
+            if (step >= st_hour) { return HCORE_ERROR; }
             step  = st_hour;
             max   = HCORE_MAX_INT_T_VALUE / (60 * 60);
             scale = 60 * 60;
@@ -233,7 +233,7 @@ hcore_parse_time(hcore_str_t *line, hcore_uint_t is_sec)
         case 'm':
             if (p < last && *p == 's')
             {
-                if (is_sec || step >= st_msec) { return HCORE_FAILED; }
+                if (is_sec || step >= st_msec) { return HCORE_ERROR; }
                 p++;
                 step  = st_msec;
                 max   = HCORE_MAX_INT_T_VALUE;
@@ -241,27 +241,27 @@ hcore_parse_time(hcore_str_t *line, hcore_uint_t is_sec)
                 break;
             }
 
-            if (step >= st_min) { return HCORE_FAILED; }
+            if (step >= st_min) { return HCORE_ERROR; }
             step  = st_min;
             max   = HCORE_MAX_INT_T_VALUE / 60;
             scale = 60;
             break;
 
         case 's':
-            if (step >= st_sec) { return HCORE_FAILED; }
+            if (step >= st_sec) { return HCORE_ERROR; }
             step  = st_sec;
             max   = HCORE_MAX_INT_T_VALUE;
             scale = 1;
             break;
 
         case ' ':
-            if (step >= st_sec) { return HCORE_FAILED; }
+            if (step >= st_sec) { return HCORE_ERROR; }
             step  = st_last;
             max   = HCORE_MAX_INT_T_VALUE;
             scale = 1;
             break;
 
-        default: return HCORE_FAILED;
+        default: return HCORE_ERROR;
         }
 
         if (step != st_msec && !is_sec)
@@ -270,11 +270,11 @@ hcore_parse_time(hcore_str_t *line, hcore_uint_t is_sec)
             max /= 1000;
         }
 
-        if (value > max) { return HCORE_FAILED; }
+        if (value > max) { return HCORE_ERROR; }
 
         value *= scale;
 
-        if (total > HCORE_MAX_INT_T_VALUE - value) { return HCORE_FAILED; }
+        if (total > HCORE_MAX_INT_T_VALUE - value) { return HCORE_ERROR; }
 
         total += value;
 
@@ -283,16 +283,16 @@ hcore_parse_time(hcore_str_t *line, hcore_uint_t is_sec)
         while (p < last && *p == ' ') { p++; }
     }
 
-    if (!valid) { return HCORE_FAILED; }
+    if (!valid) { return HCORE_ERROR; }
 
     if (!is_sec)
     {
-        if (value > HCORE_MAX_INT_T_VALUE / 1000) { return HCORE_FAILED; }
+        if (value > HCORE_MAX_INT_T_VALUE / 1000) { return HCORE_ERROR; }
 
         value *= 1000;
     }
 
-    if (total > HCORE_MAX_INT_T_VALUE - value) { return HCORE_FAILED; }
+    if (total > HCORE_MAX_INT_T_VALUE - value) { return HCORE_ERROR; }
 
     return total + value;
 }

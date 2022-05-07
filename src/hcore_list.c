@@ -24,12 +24,12 @@ hcore_list_init(hcore_pool_t *pool, hcore_list_t *list, hcore_list_compare_pt co
     list->pool         = pool;
 
     list->p = hcore_palloc(list->pool, sizeof(void *) * list->num_reserved);
-    if (list->pool == NULL) { return HCORE_FAILED; }
+    if (list->pool == NULL) { return HCORE_ERROR; }
 
     list->cmp    = compare;
     list->sorted = 1;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_list_t *
@@ -41,7 +41,7 @@ hcore_list_create(hcore_pool_t *pool, hcore_list_compare_pt compare)
 
     if (list == NULL) { return NULL; }
 
-    if (hcore_list_init(pool, list, compare) != HCORE_SUCCESSED) { return NULL; }
+    if (hcore_list_init(pool, list, compare) != HCORE_OK) { return NULL; }
 
     return list;
 }
@@ -53,7 +53,7 @@ hcore_list_add(hcore_list_t *list, void *p)
     unsigned int old_num;
 
 
-    if (list == NULL || p == NULL) { return HCORE_FAILED; }
+    if (list == NULL || p == NULL) { return HCORE_ERROR; }
 
     i = list->num_item;
     list->num_item++;
@@ -65,14 +65,14 @@ hcore_list_add(hcore_list_t *list, void *p)
 
         list->p = hcore_prealloc(list->pool, list->p, old_num * sizeof(void *),
                                list->num_reserved * sizeof(void *));
-        if (list->p == NULL) { return HCORE_FAILED; }
+        if (list->p == NULL) { return HCORE_ERROR; }
     }
 
     list->p[i] = p;
 
     list->sorted = 0;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 void
@@ -96,13 +96,13 @@ hcore_list_insert(hcore_list_t *list, void *p)
     unsigned int pos;
 
     // Validate arguments
-    if (list == NULL || p == NULL) { return HCORE_FAILED; }
+    if (list == NULL || p == NULL) { return HCORE_ERROR; }
 
     if (list->cmp == NULL)
     {
         // adding simply if there is no sort function
         hcore_list_add(list, p);
-        return HCORE_SUCCESSED;
+        return HCORE_OK;
     }
 
     // Sort immediately if it is not sorted
@@ -157,7 +157,7 @@ hcore_list_insert(hcore_list_t *list, void *p)
 
     list->p[pos] = p;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -167,13 +167,13 @@ hcore_list_delete(hcore_list_t *list, void *p)
     unsigned int old_num;
 
     // Validate arguments
-    if (list == NULL || p == NULL) { return HCORE_FAILED; }
+    if (list == NULL || p == NULL) { return HCORE_ERROR; }
 
     for (i = 0; i < list->num_item; i++)
     {
         if (list->p[i] == p) { break; }
     }
-    if (i == list->num_item) { return HCORE_FAILED; }
+    if (i == list->num_item) { return HCORE_ERROR; }
 
     n = i;
     for (i = n; i < (list->num_item - 1); i++) { list->p[i] = list->p[i + 1]; }
@@ -193,7 +193,7 @@ hcore_list_delete(hcore_list_t *list, void *p)
         }
     }
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 void

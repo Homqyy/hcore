@@ -310,9 +310,9 @@ hcore_pfree(hcore_pool_t *pool, void *p)
             hcore_free(l->alloc);
             l->alloc = NULL;
 
-            return HCORE_SUCCESSED;
+            return HCORE_OK;
         }
     }
 
-    return HCORE_FAILED;
+    return HCORE_ERROR;
 }

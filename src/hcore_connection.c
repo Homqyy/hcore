@@ -133,7 +133,7 @@ hcore_udp_send(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t size)
             if ((size_t)n != size)
             {
                 wev->error = 1;
-                return HCORE_FAILED;
+                return HCORE_ERROR;
             }
 
             c->sent_size += n;
@@ -154,7 +154,7 @@ hcore_udp_send(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t size)
         {
             wev->error = 1;
             hcore_log_error(HCORE_LOG_ALERT, c->log, errno, "sendto() failed");
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
     }
 }
@@ -203,7 +203,7 @@ hcore_udp_recv(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t size)
                 c->addr_text.data = hcore_palloc(c->pool, max_len);
                 if (c->addr_text.data == NULL)
                 {
-                    return HCORE_FAILED;
+                    return HCORE_ERROR;
                 }
 
                 c->addr_text.len = hcore_sock_ntop(c->sockaddr, c->socklen,
@@ -233,7 +233,7 @@ hcore_udp_recv(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t size)
 
             c->rev->error = 1;
 
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
 
         /* n == 0 */
@@ -241,7 +241,7 @@ hcore_udp_recv(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t size)
         c->rev->eof = 1;
 
         hcore_log_debug(c->log, 0, "connection was be closed by client");
-        return HCORE_FAILED;
+        return HCORE_ERROR;
     }
 }
 
@@ -296,7 +296,7 @@ hcore_tcp_send(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t size)
         {
             wev->error = 1;
             hcore_log_error(HCORE_LOG_ALERT, c->log, errno, "send() failed");
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
     }
 }
@@ -342,7 +342,7 @@ hcore_tcp_recv(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t size)
         {
             rev->error = 1;
             hcore_log_error(HCORE_LOG_ALERT, c->log, errno, "recv() failed");
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
     }
 }

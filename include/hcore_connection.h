@@ -27,13 +27,13 @@
 typedef struct hcore_connection_s hcore_connection_t;
 
 typedef ssize_t (*hcore_send_pt)(hcore_connection_t *c, hcore_uchar_t *buf,
-                               size_t size);
+                                 size_t size);
 
 typedef ssize_t (*hcore_recv_pt)(hcore_connection_t *c, hcore_uchar_t *buf,
-                               size_t size);
+                                 size_t size);
 
 typedef hcore_chain_t *(*hcore_send_chain_pt)(hcore_connection_t *c,
-                                          hcore_chain_t *     out);
+                                              hcore_chain_t      *out);
 
 struct hcore_connection_s
 {
@@ -41,15 +41,15 @@ struct hcore_connection_s
     int              type;      // type of socket
     struct sockaddr *sockaddr;  // socket address of peer
     socklen_t        socklen;   // length of sockaddr
-    hcore_str_t        addr_text; // text translation of sockaddr
+    hcore_str_t      addr_text; // text translation of sockaddr
 
     struct sockaddr *local_sockaddr; // local socket address
     socklen_t        local_socklen;  // local sockaddr length
 
     hcore_event_t *rev;  // event of read
     hcore_event_t *wev;  // event of write
-    hcore_pool_t * pool; // pool of connection
-    hcore_log_t *  log;  // log of connection. equal with pool->log
+    hcore_pool_t  *pool; // pool of connection
+    hcore_log_t   *log;  // log of connection. equal with pool->log
 
     hcore_send_pt       send;       // send function
     hcore_send_chain_pt send_chain; // send chain function
@@ -78,11 +78,13 @@ struct hcore_connection_s
  * @param  *buf: buffer
  * @param  size: size of buffer
  * @retval
- * Upon successful return size of sent. Return HCORE_AGAIN and c->wev->ready will
- * * be set 0 if connection is no ready. Otherwise return HCORE_FAILED (encounter
+ * Upon successful return size of sent. Return HCORE_AGAIN and c->wev->ready
+ * will
+ * * be set 0 if connection is no ready. Otherwise return HCORE_ERROR (encounter
  * * a error) and c->wev->error will be set 1
  */
-ssize_t hcore_udp_send(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t size);
+ssize_t hcore_udp_send(struct hcore_connection_s *c, hcore_uchar_t *buf,
+                       size_t size);
 
 /**
  * @brief  Receive data to 'buf' on udp
@@ -95,10 +97,11 @@ ssize_t hcore_udp_send(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t 
  * @param  size: size of buffer
  * @retval
  * Upon successful return size of received. Return HCORE_AGAIN and c->rev->ready
- * * will be set 0 if connection is no ready. Otherwise return HCORE_FAILED
+ * * will be set 0 if connection is no ready. Otherwise return HCORE_ERROR
  * * (encounter a error) and c->rev->error will be set 1
  */
-ssize_t hcore_udp_recv(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t size);
+ssize_t hcore_udp_recv(struct hcore_connection_s *c, hcore_uchar_t *buf,
+                       size_t size);
 
 /**
  * @brief  send 'buf' on tcp
@@ -107,11 +110,13 @@ ssize_t hcore_udp_recv(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t 
  * @param  *buf: buffer
  * @param  size: size of buffer
  * @retval
- * Upon successful return size of sent. Return HCORE_AGAIN and c->wev->ready will
- * * be set 0 if connection is no ready. Otherwise return HCORE_FAILED and
+ * Upon successful return size of sent. Return HCORE_AGAIN and c->wev->ready
+ * will
+ * * be set 0 if connection is no ready. Otherwise return HCORE_ERROR and
  * * c->wev->error will be set 1(encounter a error)
  */
-ssize_t hcore_tcp_send(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t size);
+ssize_t hcore_tcp_send(struct hcore_connection_s *c, hcore_uchar_t *buf,
+                       size_t size);
 
 /**
  * @brief  Receive data to 'buf' on tcp
@@ -121,10 +126,11 @@ ssize_t hcore_tcp_send(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t 
  * @param  size: size of buffer
  * @retval
  * Upon successful return size of received. Return HCORE_AGAIN and c->rev->ready
- * * will be set 0 if connection is no ready. Otherwise return HCORE_FAILED
+ * * will be set 0 if connection is no ready. Otherwise return HCORE_ERROR
  * * (encounter a error) and c->rev->error will be set 1
  */
-ssize_t hcore_tcp_recv(struct hcore_connection_s *c, hcore_uchar_t *buf, size_t size);
+ssize_t hcore_tcp_recv(struct hcore_connection_s *c, hcore_uchar_t *buf,
+                       size_t size);
 
 /**
  * @brief  send 'out' on tcp

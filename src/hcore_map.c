@@ -35,7 +35,7 @@ hcore_create_map(hcore_pool_t *pool, hcore_uint_t size)
 
     if (map == NULL) return NULL;
 
-    if (hcore_init_map(map, pool, size) != HCORE_SUCCESSED) return NULL;
+    if (hcore_init_map(map, pool, size) != HCORE_OK) return NULL;
 
     return map;
 }
@@ -43,16 +43,16 @@ hcore_create_map(hcore_pool_t *pool, hcore_uint_t size)
 hcore_int_t
 hcore_init_map(hcore_map_t *map, hcore_pool_t *pool, hcore_uint_t size)
 {
-    if (!map) return HCORE_FAILED;
+    if (!map) return HCORE_ERROR;
 
     map->pool = pool;
     map->n    = size / 8 + !!(size % 8);
     map->size = size;
     map->m    = hcore_pcalloc(map->pool, map->n);
 
-    if (map->m == NULL) return HCORE_FAILED;
+    if (map->m == NULL) return HCORE_ERROR;
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 static u_char *
@@ -82,14 +82,14 @@ _hcore_map_set(hcore_map_t *map, hcore_uint_t pos, hcore_bool_t is_set)
 
     m = _hcore_map_get_m(map, pos, &bit);
 
-    if (m == NULL) return HCORE_FAILED;
+    if (m == NULL) return HCORE_ERROR;
 
     if (is_set)
         HCORE_SET_MAP(*m, bit);
     else
         HCORE_UNSET_MAP(*m, bit);
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -107,11 +107,11 @@ _hcore_map_set_range(hcore_map_t *map, hcore_uint_t bp, hcore_uint_t ep,
 
     bm = _hcore_map_get_m(map, bp, &b_bit);
 
-    if (!bm) return HCORE_FAILED;
+    if (!bm) return HCORE_ERROR;
 
     em = _hcore_map_get_m(map, ep, &e_bit);
 
-    if (!em) return HCORE_FAILED;
+    if (!em) return HCORE_ERROR;
 
     if (bm != em)
     {
@@ -130,7 +130,7 @@ _hcore_map_set_range(hcore_map_t *map, hcore_uint_t bp, hcore_uint_t ep,
     p = bm + 1;
     while (p < em) { *p++ = 0xff; }
 
-    return HCORE_SUCCESSED;
+    return HCORE_OK;
 }
 
 hcore_int_t
@@ -159,7 +159,7 @@ hcore_map_is_set(hcore_map_t *map, hcore_uint_t pos)
 
     m = _hcore_map_get_m(map, pos, &bit);
 
-    if (m == NULL) return HCORE_FAILED;
+    if (m == NULL) return HCORE_ERROR;
 
     return *m & (1 << bit);
 }

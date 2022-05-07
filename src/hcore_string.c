@@ -62,7 +62,7 @@ hcore_parse_size(hcore_str_t *line)
 
     len = line->len;
 
-    if (len == 0) { return HCORE_FAILED; }
+    if (len == 0) { return HCORE_ERROR; }
 
     unit = line->data[len - 1];
 
@@ -93,7 +93,7 @@ hcore_parse_size(hcore_str_t *line)
     }
 
     size = hcore_atosz(line->data, len);
-    if (size == HCORE_FAILED || size > max) { return HCORE_FAILED; }
+    if (size == HCORE_ERROR || size > max) { return HCORE_ERROR; }
 
     size *= scale;
 
@@ -105,18 +105,18 @@ hcore_atosz(hcore_uchar_t *line, size_t n)
 {
     ssize_t value, cutoff, cutlim;
 
-    if (n == 0) { return HCORE_FAILED; }
+    if (n == 0) { return HCORE_ERROR; }
 
     cutoff = HCORE_MAX_SSIZE_T_VALUE / 10;
     cutlim = HCORE_MAX_SSIZE_T_VALUE % 10;
 
     for (value = 0; n--; line++)
     {
-        if (*line < '0' || *line > '9') { return HCORE_FAILED; }
+        if (*line < '0' || *line > '9') { return HCORE_ERROR; }
 
         if (value >= cutoff && (value > cutoff || *line - '0' > cutlim))
         {
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
 
         value = value * 10 + (*line - '0');
@@ -130,18 +130,18 @@ hcore_atoi(hcore_uchar_t *line, size_t n)
 {
     hcore_int_t value, cutoff, cutlim;
 
-    if (n == 0) { return HCORE_FAILED; }
+    if (n == 0) { return HCORE_ERROR; }
 
     cutoff = HCORE_MAX_INT_T_VALUE / 10;
     cutlim = HCORE_MAX_INT_T_VALUE % 10;
 
     for (value = 0; n--; line++)
     {
-        if (*line < '0' || *line > '9') { return HCORE_FAILED; }
+        if (*line < '0' || *line > '9') { return HCORE_ERROR; }
 
         if (value >= cutoff && (value > cutoff || *line - '0' > cutlim))
         {
-            return HCORE_FAILED;
+            return HCORE_ERROR;
         }
 
         value = value * 10 + (*line - '0');
@@ -156,13 +156,13 @@ hcore_hextoi(hcore_uchar_t *line, size_t n)
     hcore_uchar_t c, ch;
     hcore_int_t   value, cutoff;
 
-    if (n == 0) { return HCORE_FAILED; }
+    if (n == 0) { return HCORE_ERROR; }
 
     cutoff = HCORE_MAX_INT_T_VALUE / 16;
 
     for (value = 0; n--; line++)
     {
-        if (value > cutoff) { return HCORE_FAILED; }
+        if (value > cutoff) { return HCORE_ERROR; }
 
         ch = *line;
 
@@ -180,7 +180,7 @@ hcore_hextoi(hcore_uchar_t *line, size_t n)
             continue;
         }
 
-        return HCORE_FAILED;
+        return HCORE_ERROR;
     }
 
     return value;
