@@ -2,23 +2,53 @@
 
 set -e
 
-# build release
-[ -e release ] || mkdir release
+############################## Global Variable
 
-cd release
-cmake -DCMAKE_BUILD_TYPE=Release ..
-cmake --build .
-cd -
+PROJECT_DIR=`cd $( dirname $0 ); pwd`
+TOOLS_DIR=$PROJECT_DIR/tools
+CONFIG_FILE=$PROJECT_DIR/.config
+RELEASE_DIR=$PROJECT_DIR/release
+DEBUG_DIR=$PROJECT_DIR/debug
 
-# build debug
+############################## Function
 
-[ -e debug ] || mkdir debug
+function init
+{
+    [ -e $RELEASE_DIR ] && rm -rf $RELEASE_DIR
+    [ -e $DEBUG_DIR ] && rm -rf $DEBUG_DIR
+    [ -e $PROJECT_DIR/CMakeLists.txt ] && rm -f $PROJECT_DIR/CMakeLists.txt
+    
+    mkdir $RELEASE_DIR $DEBUG_DIR
 
-cd debug
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-cmake --build .
-cd -
+    $TOOLS_DIR/gen_cmakelists.pl \
+        $PROJECT_DIR/CMakeLists.txt.in \
+        $PROJECT_DIR/CMakeLists.txt \
+        $PROJECT_DIR
+}
 
-# pack
+function build
+{
 
-cpack --config MultiCPackConfig.cmake
+    # build release
+    cd $RELEASE_DIR
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+    cmake --build .
+
+    # build debug
+    cd $DEBUG_DIR
+    cmake -DCMAKE_BUILD_TYPE=Debug ..
+    cmake --build .
+
+    cd -
+}
+
+function build_done
+{
+    cpack --config MultiCPackConfig.cmake
+}
+
+############################## Main
+
+init
+build
+build_done

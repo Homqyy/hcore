@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(hcore VERSION 1.0.0 LANGUAGES C)
+project(hcore VERSION @@{VERSION}@@ LANGUAGES C)
 
 # init
 
@@ -12,7 +12,7 @@ aux_source_directory(src SOURCE)
 add_library(hcore ${SOURCE})
 set_target_properties(hcore PROPERTIES
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
-    VERSION "1.0.0"
+    VERSION "@@{VERSION}@@"
     SOVERSION "1")
 
 configure_file(hcore_config.h.in hcore_config.h)

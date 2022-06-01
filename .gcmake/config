@@ -1,0 +1,7 @@
+# Format: VAR=VALUE
+#
+# Variable:
+#   VERSION: major.minor.patch, such as 1.0.0
+#
+
+VERSION=$VERSION
