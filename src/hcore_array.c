@@ -21,9 +21,15 @@ hcore_array_create(hcore_pool_t *p, hcore_uint_t n, size_t size)
     hcore_array_t *a;
 
     a = hcore_palloc(p, sizeof(hcore_array_t));
-    if (a == NULL) { return NULL; }
+    if (a == NULL)
+    {
+        return NULL;
+    }
 
-    if (hcore_array_init(a, p, n, size) != HCORE_OK) { return NULL; }
+    if (hcore_array_init(a, p, n, size) != HCORE_OK)
+    {
+        return NULL;
+    }
 
     return a;
 }
@@ -49,8 +55,8 @@ hcore_array_destroy(hcore_array_t *a)
 void *
 hcore_array_push(hcore_array_t *a)
 {
-    void *      elt, *new_elt;
-    size_t      size;
+    void         *elt, *new_elt;
+    size_t        size;
     hcore_pool_t *p;
 
     if (a->nelts == a->nalloc)
@@ -76,7 +82,10 @@ hcore_array_push(hcore_array_t *a)
             /* allocate a new array */
 
             new_elt = hcore_palloc(p, 2 * size);
-            if (new_elt == NULL) { return NULL; }
+            if (new_elt == NULL)
+            {
+                return NULL;
+            }
 
             hcore_memcpy(new_elt, a->elts, size);
             a->elts = new_elt;
@@ -93,8 +102,8 @@ hcore_array_push(hcore_array_t *a)
 void *
 hcore_array_push_n(hcore_array_t *a, hcore_uint_t n)
 {
-    void *      elt, *new_elt;
-    size_t      size;
+    void         *elt, *new_elt;
+    size_t        size;
     hcore_uint_t  nalloc;
     hcore_pool_t *p;
 
@@ -124,7 +133,10 @@ hcore_array_push_n(hcore_array_t *a, hcore_uint_t n)
             nalloc = 2 * ((n >= a->nalloc) ? n : a->nalloc);
 
             new_elt = hcore_palloc(p, nalloc * a->size);
-            if (new_elt == NULL) { return NULL; }
+            if (new_elt == NULL)
+            {
+                return NULL;
+            }
 
             hcore_memcpy(new_elt, a->elts, a->nelts * a->size);
             a->elts   = new_elt;
