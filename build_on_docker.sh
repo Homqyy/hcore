@@ -45,7 +45,14 @@ fi
 container_id=`docker ps -qf "label=$DOCKER_BUILD_LABEL"`
 
 if [ -n "$container_id" ]; then
-    docker start $container_id
+	# already running
+	exit 0;
+fi
+
+container_id=`docker ps -qaf "label=$DOCKER_BUILD_LABEL"`
+
+if [ -n "$container_id" ]; then
+    docker start -a $container_id
 else
     docker run -v $PROJECT_DIR:$WORK_DIR --name $RANDOM_NAME -w $WORK_DIR $image_id $BUILD_TOOL
 fi
