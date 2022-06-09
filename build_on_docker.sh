@@ -1,11 +1,12 @@
 #!/bin/sh
 #
-# build_on_docker.sh [user] [group]
+# build_on_docker.sh <build|pack> [user] [group]
 
 set -e
 
-user=$1
-group=$2
+action=$1
+user=$2
+group=$3
 
 ############################## Global Variable
 
@@ -13,11 +14,21 @@ PROJECT_DIR=`cd $( dirname $0 ); pwd`
 DOCKER_FILE=$PROJECT_DIR/Dockerfile
 DOCKER_BUILD_LABEL="cn.homqyy.docker.build=hcore"
 WORK_DIR=/usr/src/hcore
-BUILD_TOOL=/usr/src/hcore/build.sh
+BUILD_TOOL=
 RANDOM_NAME="cn.homqyy.docker.build.hcore$( date +%Y%m%d%H%m%S )"
 BUILD_OPTIONS=
 
 ############################## Function
+
+function usage
+{
+    msg=$1;
+
+    echo "error: $msg";
+
+    echo "build_on_docker.sh <build|upload> [user] [group]"
+    exit 1;
+}
 
 function init
 {
@@ -27,6 +38,14 @@ function init
 
     if [ -n "$group" ]; then
         BUILD_OPTIONS="--build-arg GROUP=$group $BUILD_OPTIONS"
+    fi
+
+    if [ "$action" == "build" ]; then
+        BUILD_TOOL="$WORK_DIR/build.sh"
+    elif [ "$action" == "upload" ]; then
+        BUILD_TOOL="$WORK_DIR/upload.sh"
+    else
+        usage "invalid action"
     fi
 }
 
@@ -52,7 +71,8 @@ fi
 container_id=`docker ps -qaf "label=$DOCKER_BUILD_LABEL"`
 
 if [ -n "$container_id" ]; then
-    docker start -a $container_id
+    echo "already running"
+    exit 0
 else
-    docker run -v $PROJECT_DIR:$WORK_DIR --name $RANDOM_NAME -w $WORK_DIR $image_id $BUILD_TOOL
+    docker run --rm -v $PROJECT_DIR:$WORK_DIR --name $RANDOM_NAME -w $WORK_DIR $image_id $BUILD_TOOL
 fi
