@@ -3,10 +3,15 @@ FROM homqyy/dev_env_centos8
 ARG USER=1000
 ARG GROUP=1000
 
+USER root
+
 # install 'ripgrep' for 'todo-tree' extension of vscode
 RUN curl https://copr.fedorainfracloud.org/coprs/carlwgeorge/ripgrep/repo/epel-7/carlwgeorge-ripgrep-epel-7.repo \
         > /etc/yum.repos.d/carlwgeorge-ripgrep-epel-7.repo \
     && yum -y install ripgrep
+
+RUN groupadd -g $GROUP hcore \
+    && useradd -g $GROUP -u $USER hcore
 
 USER $USER:$GROUP
 
