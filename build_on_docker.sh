@@ -15,7 +15,7 @@ DOCKER_FILE=$PROJECT_DIR/Dockerfile
 DOCKER_BUILD_LABEL="cn.homqyy.docker.build=hcore"
 WORK_DIR=/usr/src/hcore
 BUILD_TOOL=
-RANDOM_NAME="cn.homqyy.docker.build.hcore$( date +%Y%m%d%H%m%S )"
+RANDOM_NAME="cn.homqyy.docker.build.hcore.$( date +%Y%m%d%H%m%S )"
 BUILD_OPTIONS=
 
 ############################## Function
