@@ -5,7 +5,7 @@ set -e
 ############################## Global Variable
 
 PROJECT_DIR=`cd $( dirname $0 ); pwd`
-TOOLS_DIR=$PROJECT_DIR/tools
+TOOLS_DIR=$PROJECT_DIR/tools-dev
 CONFIG_FILE=$PROJECT_DIR/.config
 RELEASE_DIR=$PROJECT_DIR/release
 DEBUG_DIR=$PROJECT_DIR/debug
