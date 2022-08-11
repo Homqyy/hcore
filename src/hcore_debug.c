@@ -32,7 +32,7 @@ hcore_debug_get_memory_leak_info(hcore_uchar_t *buf, size_t len)
     hcore_debug_t *db = hcore_get_debug();
     hcore_uchar_t *p, *last;
     hcore_int_t    i, j;
-    unsigned int num;
+    unsigned int   num;
 
     hcore_assert(db);
 
@@ -56,18 +56,20 @@ hcore_debug_get_memory_leak_info(hcore_uchar_t *buf, size_t len)
     p = hcore_slprintf(p, last, "# Leak Node Number       : %ud\n", num);
 
     p = hcore_slprintf(p, last, "# Leak Memory Size       : ");
-    p = hcore_strlfmt_size(db->total_alloced_size - db->total_free_size, p, last);
+    p = hcore_strlfmt_size(db->total_alloced_size - db->total_free_size, p,
+                           last);
     p = hcore_slprintf(p, last, "\n");
 
     p = hcore_slprintf(p, last, "#\n");
     p = hcore_slprintf(p, last, "# Allocated Node Number  : %uL\n",
-                     db->alloced_num);
+                       db->alloced_num);
 
     p = hcore_slprintf(p, last, "# Allocated Memory Size  : ");
     p = hcore_strlfmt_size(db->total_alloced_size, p, last);
     p = hcore_slprintf(p, last, "\n");
 
-    p = hcore_slprintf(p, last, "# Free Node Number       : %uL\n", db->free_num);
+    p = hcore_slprintf(p, last, "# Free Node Number       : %uL\n",
+                       db->free_num);
     p = hcore_slprintf(p, last, "# Free Memory Size       : ");
     p = hcore_strlfmt_size(db->total_free_size, p, last);
     p = hcore_slprintf(p, last, "\n");
@@ -86,7 +88,8 @@ hcore_debug_get_memory_leak_info(hcore_uchar_t *buf, size_t len)
 
         for (j = 0; j < node->bt_num; j++)
         {
-            p = hcore_slprintf(p, last, "    [%i] %s\n", j, node->bt_symbals[j]);
+            p = hcore_slprintf(p, last, "    [%i] %s\n", j,
+                               node->bt_symbals[j]);
         }
     }
 
@@ -146,12 +149,12 @@ hcore_debug_destroy_mnode(hcore_debug_mnode_t *node)
 hcore_debug_mnode_t *
 hcore_debug_create_mnode(const char *name, size_t size)
 {
-    hcore_debug_t *      db = hcore_get_debug();
+    hcore_debug_t       *db = hcore_get_debug();
     hcore_debug_mnode_t *node;
-    void *             bt[HCORE_DEBUG_MAX_STACK_NUM] = {0};
-    void **            pbt;
-    int                max_num;
-    int                num;
+    void                *bt[HCORE_DEBUG_MAX_STACK_NUM] = {0};
+    void               **pbt;
+    int                  max_num;
+    int                  num;
 
     hcore_assert(size);
 
@@ -230,8 +233,8 @@ hcore_debug_t *
 hcore_create_debug(hcore_log_t *log, hcore_uint_t max_stack_num)
 {
     hcore_debug_t *db;
-    hcore_pool_t * pool = NULL;
-    hcore_log_t *  new_log;
+    hcore_pool_t  *pool = NULL;
+    hcore_log_t   *new_log;
 
     pool = hcore_create_pool(HCORE_POOL_SIZE_DEFAULT, log);
     if (pool == NULL) return NULL;

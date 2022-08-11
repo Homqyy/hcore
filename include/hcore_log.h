@@ -22,6 +22,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#define HCORE_LOG_FILE_STDOUT "@STDOUT"
+#define HCORE_LOG_FILE_STDERR "@STDERR"
+
 /* 日志级别 */
 #define HCORE_LOG_STDERR 0
 #define HCORE_LOG_EMERG  1
@@ -38,16 +41,19 @@
 #define HCORE_LOG_ERRSTR_LENGTH_MAX 2048
 #define HCORE_LOG_TIME_LENGTH       sizeof("1970/09/28 12:00:00 +0000 GMT")
 
-typedef void (*hcore_log_get_time_pt)(hcore_uchar_t time[HCORE_LOG_TIME_LENGTH]);
+typedef void (*hcore_log_get_time_pt)(
+    hcore_uchar_t time[HCORE_LOG_TIME_LENGTH]);
 typedef struct hcore_log_s hcore_log_t;
-typedef hcore_uchar_t *(*hcore_log_handler_pt)(hcore_log_t *log, hcore_uchar_t *buf, hcore_uchar_t *last);
+typedef hcore_uchar_t *(*hcore_log_handler_pt)(hcore_log_t   *log,
+                                               hcore_uchar_t *buf,
+                                               hcore_uchar_t *last);
 
 struct hcore_log_s
 {
     hcore_uint_t log_level; // 日志级别
-    int        fd;        // 日志文件的描述符
-    char *     filename;  // 日志文件名
-    char *     object; // 目标名称，用于记录日志（日志格式中有一个字段就是'目标'）
+    int          fd;        // 日志文件的描述符
+    char        *filename;  // 日志文件名
+    char        *object; // 目标名称，用于记录日志（日志格式中有一个字段就是'目标'）
 
     /*
      * we declare "action" as "char *" because the actions are usually
@@ -55,19 +61,21 @@ struct hcore_log_s
      * their types all the time
      */
     hcore_log_handler_pt handler;
-    void *             data;
-    char *             action;
+    void                *data;
+    char                *action;
 
     hcore_log_get_time_pt
         get_time; // 获取时间的回调函数，如果为空则默认调用'hcore_log_get_localtime()'
+
+    hcore_uint_t internal : 1; // is internal log
 };
 
 
 void hcore_log_error_core(int level, hcore_log_t *log, hcore_err_t err,
-                        const char *fmt, ...);
+                          const char *fmt, ...);
 
 #define hcore_log_error(level, log, err, ...) \
-    if ((log)->log_level >= level)          \
+    if ((log)->log_level >= level)            \
     hcore_log_error_core(level, log, err, __VA_ARGS__)
 
 #ifdef _HCORE_DEBUG
@@ -78,9 +86,13 @@ void hcore_log_error_core(int level, hcore_log_t *log, hcore_err_t err,
 #else // _HCORE_DEBUG
 
 #define hcore_log_debug(log, err, ...) \
-    while (0) {}
+    while (0)                          \
+    {                                  \
+    }
 
 #endif // _HCORE_DEBUG
+
+#define HCORE_LOG_IS_INTERNAL(log_file) ((log_file)[0] == '@')
 
 /**
  * @brief  将日志字符串转化为对应的整型值，支持：'emerg', 'alert', 'crit',
@@ -132,5 +144,34 @@ void hcore_log_get_time(hcore_uchar_t time[HCORE_LOG_TIME_LENGTH]);
  * @retval None
  */
 void hcore_log_get_localtime(hcore_uchar_t time[HCORE_LOG_TIME_LENGTH]);
+
+/**
+ * @brief  create a log
+ * @note
+ * @param  *pool: pool
+ * @param  *log_file: log file path
+ * @param  level: log level
+ * @retval Upon successful return 'log', otherwise return 'NULL'
+ */
+hcore_log_t *hcore_create_log(hcore_pool_t *pool, char *log_file,
+                              hcore_int_t level);
+
+/**
+ * @brief  destroy the log
+ * @note
+ * @param  *log: log
+ * @retval None
+ */
+void hcore_destroy_log(hcore_log_t *log);
+
+/**
+ * @brief  open log by log_file
+ * @note
+ * @param  *log:
+ * @param  *log_file:
+ * @param  level:
+ * @retval
+ */
+hcore_int_t hcore_open_log(hcore_log_t *log, char *log_file, hcore_int_t level);
 
 #endif // !_HCORE_LOG_H_INCLUDED_
