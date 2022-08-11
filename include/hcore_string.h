@@ -90,19 +90,19 @@ ssize_t      hcore_parse_size(hcore_str_t *line);
  * @return sde_uint_t Upon successful is return integer expression of version
  * string, otherwise return 0.
  */
-hcore_uint_t hcore_parse_version(hcore_str_t *line)
+hcore_uint_t hcore_parse_version(hcore_str_t *line);
 
-    /**
-     * @brief format 'size' as string in ‘buff'(buffer)
-     * @note
-     * @param  size: size that need be format as string, and unit is 'byte'
-     * @param  *buff: buffer
-     * @param  *last: last of buffer
-     * @retval
-     * * last of string
-     */
-    hcore_uchar_t *hcore_strlfmt_size(ssize_t size, hcore_uchar_t *buff,
-                                      hcore_uchar_t *last);
+/**
+ * @brief format 'size' as string in ‘buff'(buffer)
+ * @note
+ * @param  size: size that need be format as string, and unit is 'byte'
+ * @param  *buff: buffer
+ * @param  *last: last of buffer
+ * @retval
+ * * last of string
+ */
+hcore_uchar_t *hcore_strlfmt_size(ssize_t size, hcore_uchar_t *buff,
+                                  hcore_uchar_t *last);
 
 #define hcore_strfmt_size(size, buff, buff_len) \
     hcore_strlfmt_size(size, buff, buff + buff_len)

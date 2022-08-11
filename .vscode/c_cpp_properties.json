@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/usr/include/**",
+                "${workspaceFolder}/src/",
+                "${workspaceFolder}/include/"
+            ],
+            "defines": [
+                "_SDE_DEBUG"
+            ],
+            "cStandard": "gnu99",
+            "cppStandard": "${default}",
+            "intelliSenseMode": "linux-gcc-x64",
+            "forcedInclude": []
+        }
+    ],
+    "version": 4
+}
