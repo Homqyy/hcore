@@ -18,7 +18,6 @@
 	"extensions": [
 		"ms-vscode.cpptools",
 		"xaver.clang-format",
-		"twxs.cmake",
 		"ms-vscode.cmake-tools",
 		"christian-kohler.path-intellisense",
 		"Gruntfuggly.todo-tree",

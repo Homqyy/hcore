@@ -14,19 +14,20 @@
 
 #include <hcore_base.h>
 #include <hcore_constant.h>
-#include <hcore_string.h>
 #include <hcore_debug.h>
+#include <hcore_string.h>
 
 #include <stdarg.h>
 
 static hcore_uchar_t *hcore_sprintf_num(hcore_uchar_t *buf, hcore_uchar_t *last,
-                                    hcore_uint64_t ui64, hcore_uchar_t zero,
-                                    hcore_uint_t hexadecimal, hcore_uint_t width);
+                                        hcore_uint64_t ui64, hcore_uchar_t zero,
+                                        hcore_uint_t hexadecimal,
+                                        hcore_uint_t width);
 
 hcore_uchar_t *
 hcore_strlfmt_size(ssize_t size, hcore_uchar_t *buff, hcore_uchar_t *last)
 {
-    const char * units[] = {"B", "KB", "MB", "GB", "TB", NULL};
+    const char  *units[] = {"B", "KB", "MB", "GB", "TB", NULL};
     const char **pu;
     ssize_t      scale, v;
     double       decimal;
@@ -62,7 +63,10 @@ hcore_parse_size(hcore_str_t *line)
 
     len = line->len;
 
-    if (len == 0) { return HCORE_ERROR; }
+    if (len == 0)
+    {
+        return HCORE_ERROR;
+    }
 
     unit = line->data[len - 1];
 
@@ -93,11 +97,96 @@ hcore_parse_size(hcore_str_t *line)
     }
 
     size = hcore_atosz(line->data, len);
-    if (size == HCORE_ERROR || size > max) { return HCORE_ERROR; }
+    if (size == HCORE_ERROR || size > max)
+    {
+        return HCORE_ERROR;
+    }
 
     size *= scale;
 
     return size;
+}
+
+hcore_uint_t
+hcore_parse_version(hcore_str_t *line)
+{
+    // v1.0.0
+
+    enum
+    {
+        prefix_phase,
+        separator_phase,
+        version_phase,
+    };
+
+    hcore_uchar_t *p     = line->data;
+    hcore_uchar_t *last  = line->data + line->len;
+    hcore_uint_t   phase = prefix_phase;
+
+    hcore_uint_t master = 0;
+    hcore_uint_t minor  = 0;
+    hcore_uint_t patch  = 0;
+
+    hcore_uint_t *vers[4] = {&master, &minor, &patch, NULL};
+    hcore_uint_t  ver_pos = 0; // version position
+
+    while (p < last)
+    {
+        char c = *p;
+        switch (phase)
+        {
+        case prefix_phase:
+            if (c == 'v' || c == 'V')
+            {
+                p++;
+            }
+
+            phase = version_phase;
+            break;
+
+        case version_phase:
+            if (vers[ver_pos] == NULL) break; // complete version
+
+            while (1)
+            {
+                if ('0' <= c && c <= '9')
+                {
+                    *vers[ver_pos] = *vers[ver_pos] * 10 + (c - '0');
+
+                    if (0xff < *vers[ver_pos])
+                    {
+                        goto error;
+                    }
+
+                    p++;
+                    c = *p;
+                }
+                else
+                {
+                    ver_pos++;
+                    phase = separator_phase;
+                    break;
+                }
+            }
+            break;
+
+        case separator_phase:
+            if (c != '.')
+            {
+                goto error;
+            }
+
+            phase = version_phase;
+            break;
+        }
+    }
+
+    if (master == 0) goto error;
+
+    return master << 16 | minor << 8 | patch;
+
+error:
+    return 0; // '0' express error
 }
 
 ssize_t
@@ -105,14 +194,20 @@ hcore_atosz(hcore_uchar_t *line, size_t n)
 {
     ssize_t value, cutoff, cutlim;
 
-    if (n == 0) { return HCORE_ERROR; }
+    if (n == 0)
+    {
+        return HCORE_ERROR;
+    }
 
     cutoff = HCORE_MAX_SSIZE_T_VALUE / 10;
     cutlim = HCORE_MAX_SSIZE_T_VALUE % 10;
 
     for (value = 0; n--; line++)
     {
-        if (*line < '0' || *line > '9') { return HCORE_ERROR; }
+        if (*line < '0' || *line > '9')
+        {
+            return HCORE_ERROR;
+        }
 
         if (value >= cutoff && (value > cutoff || *line - '0' > cutlim))
         {
@@ -130,14 +225,20 @@ hcore_atoi(hcore_uchar_t *line, size_t n)
 {
     hcore_int_t value, cutoff, cutlim;
 
-    if (n == 0) { return HCORE_ERROR; }
+    if (n == 0)
+    {
+        return HCORE_ERROR;
+    }
 
     cutoff = HCORE_MAX_INT_T_VALUE / 10;
     cutlim = HCORE_MAX_INT_T_VALUE % 10;
 
     for (value = 0; n--; line++)
     {
-        if (*line < '0' || *line > '9') { return HCORE_ERROR; }
+        if (*line < '0' || *line > '9')
+        {
+            return HCORE_ERROR;
+        }
 
         if (value >= cutoff && (value > cutoff || *line - '0' > cutlim))
         {
@@ -156,13 +257,19 @@ hcore_hextoi(hcore_uchar_t *line, size_t n)
     hcore_uchar_t c, ch;
     hcore_int_t   value, cutoff;
 
-    if (n == 0) { return HCORE_ERROR; }
+    if (n == 0)
+    {
+        return HCORE_ERROR;
+    }
 
     cutoff = HCORE_MAX_INT_T_VALUE / 16;
 
     for (value = 0; n--; line++)
     {
-        if (value > cutoff) { return HCORE_ERROR; }
+        if (value > cutoff)
+        {
+            return HCORE_ERROR;
+        }
 
         ch = *line;
 
@@ -202,16 +309,16 @@ hcore_hex_dump(hcore_uchar_t *dst, hcore_uchar_t *src, size_t len)
 
 hcore_uchar_t *
 hcore_vslprintf(hcore_uchar_t *buf, hcore_uchar_t *last, const char *fmt,
-              va_list args)
+                va_list args)
 {
     hcore_uchar_t *p, zero;
-    int          d;
-    double       f;
-    size_t       len, slen;
+    int            d;
+    double         f;
+    size_t         len, slen;
     hcore_int64_t  i64;
     hcore_uint64_t ui64, frac;
     hcore_uint_t   width, sign, hex, max_width, frac_width, scale, n;
-    hcore_str_t *  v;
+    hcore_str_t   *v;
     hcore_msec_t   ms;
 
     while (*fmt && buf < last)
@@ -304,7 +411,10 @@ hcore_vslprintf(hcore_uchar_t *buf, hcore_uchar_t *last, const char *fmt,
 
                 if (slen == (size_t)-1)
                 {
-                    while (*p && buf < last) { *buf++ = *p++; }
+                    while (*p && buf < last)
+                    {
+                        *buf++ = *p++;
+                    }
                 }
                 else
                 {
@@ -346,7 +456,10 @@ hcore_vslprintf(hcore_uchar_t *buf, hcore_uchar_t *last, const char *fmt,
                 break;
 
             case 'z':
-                if (sign) { i64 = (hcore_int64_t)va_arg(args, ssize_t); }
+                if (sign)
+                {
+                    i64 = (hcore_int64_t)va_arg(args, ssize_t);
+                }
                 else
                 {
                     ui64 = (hcore_uint64_t)va_arg(args, size_t);
@@ -354,18 +467,27 @@ hcore_vslprintf(hcore_uchar_t *buf, hcore_uchar_t *last, const char *fmt,
                 break;
 
             case 'i':
-                if (sign) { i64 = (hcore_int64_t)va_arg(args, hcore_int_t); }
+                if (sign)
+                {
+                    i64 = (hcore_int64_t)va_arg(args, hcore_int_t);
+                }
                 else
                 {
                     ui64 = (hcore_uint64_t)va_arg(args, hcore_uint_t);
                 }
 
-                if (max_width) { width = HCORE_INT_T_LEN; }
+                if (max_width)
+                {
+                    width = HCORE_INT_T_LEN;
+                }
 
                 break;
 
             case 'd':
-                if (sign) { i64 = (hcore_int64_t)va_arg(args, int); }
+                if (sign)
+                {
+                    i64 = (hcore_int64_t)va_arg(args, int);
+                }
                 else
                 {
                     ui64 = (hcore_uint64_t)va_arg(args, u_int);
@@ -373,7 +495,10 @@ hcore_vslprintf(hcore_uchar_t *buf, hcore_uchar_t *last, const char *fmt,
                 break;
 
             case 'l':
-                if (sign) { i64 = (hcore_int64_t)va_arg(args, long); }
+                if (sign)
+                {
+                    i64 = (hcore_int64_t)va_arg(args, long);
+                }
                 else
                 {
                     ui64 = (hcore_uint64_t)va_arg(args, u_long);
@@ -381,7 +506,10 @@ hcore_vslprintf(hcore_uchar_t *buf, hcore_uchar_t *last, const char *fmt,
                 break;
 
             case 'D':
-                if (sign) { i64 = (hcore_int64_t)va_arg(args, hcore_int32_t); }
+                if (sign)
+                {
+                    i64 = (hcore_int64_t)va_arg(args, hcore_int32_t);
+                }
                 else
                 {
                     ui64 = (hcore_uint64_t)va_arg(args, hcore_uint32_t);
@@ -389,7 +517,10 @@ hcore_vslprintf(hcore_uchar_t *buf, hcore_uchar_t *last, const char *fmt,
                 break;
 
             case 'L':
-                if (sign) { i64 = va_arg(args, hcore_int64_t); }
+                if (sign)
+                {
+                    i64 = va_arg(args, hcore_int64_t);
+                }
                 else
                 {
                     ui64 = va_arg(args, hcore_uint64_t);
@@ -411,7 +542,10 @@ hcore_vslprintf(hcore_uchar_t *buf, hcore_uchar_t *last, const char *fmt,
                 if (frac_width)
                 {
                     scale = 1;
-                    for (n = frac_width; n; n--) { scale *= 10; }
+                    for (n = frac_width; n; n--)
+                    {
+                        scale *= 10;
+                    }
 
                     frac = (hcore_uint64_t)((f - (double)ui64) * scale + 0.5);
 
@@ -426,9 +560,13 @@ hcore_vslprintf(hcore_uchar_t *buf, hcore_uchar_t *last, const char *fmt,
 
                 if (frac_width)
                 {
-                    if (buf < last) { *buf++ = '.'; }
+                    if (buf < last)
+                    {
+                        *buf++ = '.';
+                    }
 
-                    buf = hcore_sprintf_num(buf, last, frac, '0', 0, frac_width);
+                    buf =
+                        hcore_sprintf_num(buf, last, frac, '0', 0, frac_width);
                 }
 
                 fmt++;
@@ -499,14 +637,15 @@ hcore_vslprintf(hcore_uchar_t *buf, hcore_uchar_t *last, const char *fmt,
 
 static hcore_uchar_t *
 hcore_sprintf_num(hcore_uchar_t *buf, hcore_uchar_t *last, hcore_uint64_t ui64,
-                hcore_uchar_t zero, hcore_uint_t hexadecimal, hcore_uint_t width)
+                  hcore_uchar_t zero, hcore_uint_t hexadecimal,
+                  hcore_uint_t width)
 {
-    hcore_uchar_t *      p, temp[HCORE_INT64_LEN + 1];
+    hcore_uchar_t       *p, temp[HCORE_INT64_LEN + 1];
     /*
      * we need temp[NGX_INT64_LEN] only,
      * but icc issues the warning
      */
-    size_t             len;
+    size_t               len;
     hcore_uint32_t       ui32;
     static hcore_uchar_t hex[] = "0123456789abcdef";
     static hcore_uchar_t HEX[] = "0123456789ABCDEF";
@@ -534,20 +673,23 @@ hcore_sprintf_num(hcore_uchar_t *buf, hcore_uchar_t *last, hcore_uint64_t ui64,
 
             ui32 = (hcore_uint32_t)ui64;
 
-            do {
+            do
+            {
                 *--p = (hcore_uchar_t)(ui32 % 10 + '0');
             } while (ui32 /= 10);
         }
         else
         {
-            do {
+            do
+            {
                 *--p = (hcore_uchar_t)(ui64 % 10 + '0');
             } while (ui64 /= 10);
         }
     }
     else if (hexadecimal == 1)
     {
-        do {
+        do
+        {
             /* the "(uint32_t)" cast disables the BCC's warning */
             *--p = hex[(hcore_uint32_t)(ui64 & 0xf)];
 
@@ -556,7 +698,8 @@ hcore_sprintf_num(hcore_uchar_t *buf, hcore_uchar_t *last, hcore_uint64_t ui64,
     else
     { /* hexadecimal == 2 */
 
-        do {
+        do
+        {
             /* the "(uint32_t)" cast disables the BCC's warning */
             *--p = HEX[(hcore_uint32_t)(ui64 & 0xf)];
 
@@ -567,13 +710,19 @@ hcore_sprintf_num(hcore_uchar_t *buf, hcore_uchar_t *last, hcore_uint64_t ui64,
 
     len = (temp + HCORE_INT64_LEN) - p;
 
-    while (len++ < width && buf < last) { *buf++ = zero; }
+    while (len++ < width && buf < last)
+    {
+        *buf++ = zero;
+    }
 
     /* number safe copy */
 
     len = (temp + HCORE_INT64_LEN) - p;
 
-    if (buf + len > last) { len = last - buf; }
+    if (buf + len > last)
+    {
+        len = last - buf;
+    }
 
     return hcore_cpymem(buf, p, len);
 }
@@ -608,8 +757,8 @@ hcore_array_t *
 hcore_strtokz(hcore_pool_t *pool, hcore_str_t *src, char *delim)
 {
     hcore_array_t *t;
-    hcore_str_t *str;
-    hcore_uint_t i;
+    hcore_str_t   *str;
+    hcore_uint_t   i;
 
     t = hcore_strtok(pool, src, delim);
 
@@ -657,14 +806,14 @@ hcore_strtok(hcore_pool_t *pool, hcore_str_t *src, char *delim)
         delim = " ,\t\r\n";
     }
 
-    last = src->data + src->len;
+    last  = src->data + src->len;
     start = 0;
-    sep = 0;
-    str = NULL;
+    sep   = 0;
+    str   = NULL;
 
     for (p = src->data; p < last; p++)
     {
-        for (p_delim = (u_char *) delim; *p_delim; p_delim++)
+        for (p_delim = (u_char *)delim; *p_delim; p_delim++)
         {
             if (*p == *p_delim)
             {
@@ -675,7 +824,7 @@ hcore_strtok(hcore_pool_t *pool, hcore_str_t *src, char *delim)
 
         if (sep)
         {
-            sep = 0;
+            sep   = 0;
             start = 0;
             continue; // next character
         }
@@ -690,7 +839,7 @@ hcore_strtok(hcore_pool_t *pool, hcore_str_t *src, char *delim)
             }
 
             str->data = p;
-            str->len = 0;
+            str->len  = 0;
         }
 
         hcore_assert(str);
