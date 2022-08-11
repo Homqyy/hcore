@@ -12,24 +12,29 @@
  */
 
 #include <hcore_astring.h>
-#include <hcore_string.h>
 #include <hcore_debug.h>
+#include <hcore_string.h>
 
 hcore_int_t
 hcore_asnprintf(hcore_astring_t *astr, const char *fmt, ...)
 {
-    if (NULL == astr) { return HCORE_ERROR; }
+    hcore_assert(astr);
+
+    if (NULL == astr || NULL == fmt)
+    {
+        return HCORE_ERROR;
+    }
 
     hcore_uchar_t *new_data;
     hcore_uchar_t *last;
-    size_t       new_size = 0;
+    size_t         new_size = 0;
 
     while (1)
     {
         va_list args;
         va_start(args, fmt);
-        last =
-            hcore_vslprintf(astr->data + astr->len, astr->data + astr->size, fmt, args);
+        last = hcore_vslprintf(astr->data + astr->len, astr->data + astr->size,
+                               fmt, args);
         va_end(args);
 
         if (last != astr->data + astr->size)
@@ -38,7 +43,7 @@ hcore_asnprintf(hcore_astring_t *astr, const char *fmt, ...)
         }
 
         new_size = astr->size * 2;
-        new_data  = astr->realloc(astr->data, new_size);
+        new_data = astr->realloc(astr->data, new_size);
         if (NULL == new_data)
         {
             astr->error = 1;
@@ -49,22 +54,22 @@ hcore_asnprintf(hcore_astring_t *astr, const char *fmt, ...)
         astr->size = new_size;
     }
 
-    astr->len            = last - astr->data;
+    astr->len             = last - astr->data;
     astr->data[astr->len] = 0;
 
     return HCORE_OK;
 }
 
 hcore_int_t
-hcore_init_astring(hcore_astring_t * astr, size_t size, 
-    astr_realloc_pt astr_realloc, astr_free_pt astr_free)
+hcore_init_astring(hcore_astring_t *astr, size_t size,
+                   astr_realloc_pt astr_realloc, astr_free_pt astr_free)
 {
     hcore_assert(astr);
 
     if (astr == NULL) return HCORE_ERROR;
 
     /* default value */
-    if (size == 0) size = 64;
+    if (size == 0) size = HCORE_ASTRING_DEF_SIZE;
     if (astr_realloc == NULL) astr_realloc = realloc;
     if (astr_free == NULL) astr_free = free;
 
@@ -75,22 +80,20 @@ hcore_init_astring(hcore_astring_t * astr, size_t size,
     }
 
     astr->realloc = astr_realloc;
-    astr->free = astr_free;
-    astr->data = data;
-    astr->len = 0;
-    astr->size = size;
+    astr->free    = astr_free;
+    astr->data    = data;
+    astr->len     = 0;
+    astr->size    = size;
     astr->created = 0;
-    astr->error = 0;
+    astr->error   = 0;
+    astr->inited  = 1;
 
-#ifdef _HCORE_DEBUG
-    astr->inited = 1;
-#endif
     return HCORE_OK;
 }
 
 hcore_astring_t *
-hcore_create_astring(size_t size, 
-    astr_realloc_pt astr_realloc, astr_free_pt astr_free)
+hcore_create_astring(size_t size, astr_realloc_pt astr_realloc,
+                     astr_free_pt astr_free)
 {
     if (astr_realloc == NULL) astr_realloc = realloc;
     if (astr_free == NULL) astr_free = free;
@@ -109,15 +112,16 @@ hcore_create_astring(size_t size,
     return astr;
 }
 
-void hcore_destroy_astring(hcore_astring_t * astr)
+void
+hcore_destroy_astring(hcore_astring_t *astr)
 {
-    if (astr == NULL) return;
+    hcore_assert(astr && astr->inited);
 
-#ifdef _HCORE_DEBUG
+    if (astr == NULL || astr->inited == 0) return;
+
     hcore_assert(astr->inited);
 
     astr->inited = 0;
-#endif
 
     astr->free(astr->data);
 

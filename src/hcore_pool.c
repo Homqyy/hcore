@@ -23,7 +23,7 @@
 #define HCORE_POOL_ALIGNMENT 16
 
 static inline void *hcore_palloc_small(hcore_pool_t *pool, size_t size,
-                                     hcore_uint_t align);
+                                       hcore_uint_t align);
 
 static void *hcore_palloc_block(hcore_pool_t *pool, size_t size);
 static void *hcore_palloc_large(hcore_pool_t *pool, size_t size);
@@ -31,14 +31,20 @@ static void *hcore_palloc_large(hcore_pool_t *pool, size_t size);
 void *
 hcore_prealloc(hcore_pool_t *pool, void *p, size_t old_size, size_t new_size)
 {
-    void *      new_p;
+    void         *new_p;
     hcore_pool_t *node;
 
-    if (p == NULL) { return hcore_palloc(pool, new_size); }
+    if (p == NULL)
+    {
+        return hcore_palloc(pool, new_size);
+    }
 
     if (new_size == 0)
     {
-        if ((u_char *)p + old_size == pool->d.last) { pool->d.last = p; }
+        if ((u_char *)p + old_size == pool->d.last)
+        {
+            pool->d.last = p;
+        }
         else
         {
             hcore_pfree(pool, p);
@@ -60,10 +66,16 @@ hcore_prealloc(hcore_pool_t *pool, void *p, size_t old_size, size_t new_size)
         }
     }
 
-    if (new_size <= old_size) { return p; }
+    if (new_size <= old_size)
+    {
+        return p;
+    }
 
     new_p = hcore_palloc(pool, new_size);
-    if (new_p == NULL) { return NULL; }
+    if (new_p == NULL)
+    {
+        return NULL;
+    }
 
     hcore_memcpy(new_p, p, old_size);
 
@@ -76,7 +88,8 @@ void *
 hcore_memalign(size_t alignment, size_t size, hcore_log_t *log)
 {
 #ifdef _HCORE_DEBUG
-    hcore_debug_mnode_t *node = hcore_debug_create_mnode("hcore_memalign", size);
+    hcore_debug_mnode_t *node =
+        hcore_debug_create_mnode("hcore_memalign", size);
     if (node == NULL) return NULL;
 
     return node->addr;
@@ -89,7 +102,7 @@ hcore_memalign(size_t alignment, size_t size, hcore_log_t *log)
     if (err)
     {
         hcore_log_error(HCORE_LOG_EMERG, log, err,
-                      "posix_memalign(%uz, %uz) failed", alignment, size);
+                        "posix_memalign(%uz, %uz) failed", alignment, size);
         p = NULL;
     }
 
@@ -102,8 +115,8 @@ hcore_memalign(size_t alignment, size_t size, hcore_log_t *log)
 void
 hcore_destroy_pool(hcore_pool_t *pool)
 {
-    hcore_pool_t *        p, *n;
-    hcore_pool_large_t *  l;
+    hcore_pool_t         *p, *n;
+    hcore_pool_large_t   *l;
     hcore_pool_cleanup_t *cleanup;
 
     for (cleanup = pool->cleanup; cleanup; cleanup = cleanup->next)
@@ -117,14 +130,20 @@ hcore_destroy_pool(hcore_pool_t *pool)
 
     for (l = pool->large; l; l = l->next)
     {
-        if (l->alloc) { hcore_free(l->alloc); }
+        if (l->alloc)
+        {
+            hcore_free(l->alloc);
+        }
     }
 
     for (p = pool, n = pool->d.next; /* void */; p = n, n = n->d.next)
     {
         hcore_free(p);
 
-        if (n == NULL) { break; }
+        if (n == NULL)
+        {
+            break;
+        }
     }
 }
 
@@ -132,10 +151,13 @@ hcore_pool_t *
 hcore_create_pool(size_t size, hcore_log_t *log)
 {
     hcore_pool_t *p;
-    int         hcore_pagesize;
+    int           hcore_pagesize;
 
     p = hcore_memalign(HCORE_POOL_ALIGNMENT, size, log);
-    if (p == NULL) { return NULL; }
+    if (p == NULL)
+    {
+        return NULL;
+    }
 
     p->d.last   = (hcore_uchar_t *)p + sizeof(hcore_pool_t);
     p->d.end    = (hcore_uchar_t *)p + size;
@@ -162,12 +184,18 @@ hcore_pool_cleanup_add(hcore_pool_t *pool, size_t data_size)
     hcore_pool_cleanup_t *c;
 
     c = hcore_palloc(pool, sizeof(hcore_pool_cleanup_t));
-    if (c == NULL) { return NULL; }
+    if (c == NULL)
+    {
+        return NULL;
+    }
 
     if (data_size)
     {
         c->data = hcore_palloc(pool, data_size);
-        if (c->data == NULL) { return NULL; }
+        if (c->data == NULL)
+        {
+            return NULL;
+        }
     }
     else
     {
@@ -188,7 +216,10 @@ hcore_pcalloc(hcore_pool_t *pool, size_t size)
     void *p;
 
     p = hcore_palloc(pool, size);
-    if (p) { hcore_memzero(p, size); }
+    if (p)
+    {
+        hcore_memzero(p, size);
+    }
 
     return p;
 }
@@ -196,7 +227,10 @@ hcore_pcalloc(hcore_pool_t *pool, size_t size)
 void *
 hcore_pnalloc(hcore_pool_t *pool, size_t size)
 {
-    if (size <= pool->max) { return hcore_palloc_small(pool, size, 0); }
+    if (size <= pool->max)
+    {
+        return hcore_palloc_small(pool, size, 0);
+    }
 
     return hcore_palloc_large(pool, size);
 }
@@ -205,14 +239,18 @@ static inline void *
 hcore_palloc_small(hcore_pool_t *pool, size_t size, hcore_uint_t align)
 {
     hcore_uchar_t *m;
-    hcore_pool_t * p;
+    hcore_pool_t  *p;
 
     p = pool->current;
 
-    do {
+    do
+    {
         m = p->d.last;
 
-        if (align) { m = hcore_align_ptr(m, HCORE_ALIGNMENT); }
+        if (align)
+        {
+            m = hcore_align_ptr(m, HCORE_ALIGNMENT);
+        }
 
         if ((size_t)(p->d.end - m) >= size)
         {
@@ -232,13 +270,16 @@ static void *
 hcore_palloc_block(hcore_pool_t *pool, size_t size)
 {
     hcore_uchar_t *m;
-    size_t       psize;
-    hcore_pool_t * p, *new_pool;
+    size_t         psize;
+    hcore_pool_t  *p, *new_pool;
 
     psize = (size_t)(pool->d.end - (hcore_uchar_t *)pool);
 
     m = hcore_memalign(HCORE_POOL_ALIGNMENT, psize, pool->log);
-    if (m == NULL) { return NULL; }
+    if (m == NULL)
+    {
+        return NULL;
+    }
 
     new_pool = (hcore_pool_t *)m;
 
@@ -252,7 +293,10 @@ hcore_palloc_block(hcore_pool_t *pool, size_t size)
 
     for (p = pool->current; p->d.next; p = p->d.next)
     {
-        if (p->d.failed++ > 4) { pool->current = p->d.next; }
+        if (p->d.failed++ > 4)
+        {
+            pool->current = p->d.next;
+        }
     }
 
     p->d.next = new_pool;
@@ -263,12 +307,15 @@ hcore_palloc_block(hcore_pool_t *pool, size_t size)
 static void *
 hcore_palloc_large(hcore_pool_t *pool, size_t size)
 {
-    void *            p;
+    void               *p;
     hcore_uint_t        n;
     hcore_pool_large_t *large;
 
     p = hcore_malloc(size);
-    if (p == NULL) { return NULL; }
+    if (p == NULL)
+    {
+        return NULL;
+    }
 
     n = 0;
 
@@ -280,7 +327,10 @@ hcore_palloc_large(hcore_pool_t *pool, size_t size)
             return p;
         }
 
-        if (n++ > 3) { break; }
+        if (n++ > 3)
+        {
+            break;
+        }
     }
 
     large = hcore_palloc_small(pool, sizeof(hcore_pool_large_t), 1);

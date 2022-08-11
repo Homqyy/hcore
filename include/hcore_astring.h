@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define HCORE_ASTRING_DEF_SIZE 64
+
 typedef void *(*astr_realloc_pt)(void *ptr, size_t size);
 typedef void (*astr_free_pt)(void *ptr);
 
@@ -33,9 +35,7 @@ typedef struct
 
     hcore_uint_t error   : 1;
     hcore_uint_t created : 1;
-#ifdef _HCORE_DEBUG
-    hcore_uint_t inited : 1;
-#endif
+    hcore_uint_t inited  : 1;
 } hcore_astring_t;
 
 /*

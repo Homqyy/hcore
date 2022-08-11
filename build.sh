@@ -10,6 +10,7 @@ CONFIG_FILE=$PROJECT_DIR/.config
 RELEASE_DIR=$PROJECT_DIR/release
 DEBUG_DIR=$PROJECT_DIR/debug
 PACKAGES_DIR=$PROJECT_DIR/packages
+CLEAN_ALL=$1
 
 ############################## Function
 
@@ -17,16 +18,17 @@ BUILD_NUMBER_FILE=$PROJECT_DIR/.build_number
 
 function init
 {
-    [ -e $PACKAGES_DIR ] && rm -rf $PACKAGES_DIR
-    [ -e $RELEASE_DIR ] && rm -rf $RELEASE_DIR
-    [ -e $DEBUG_DIR ] && rm -rf $DEBUG_DIR
-    [ -e $PROJECT_DIR/CMakeLists.txt ] && rm -f $PROJECT_DIR/CMakeLists.txt
-
-    [ -e $BUILD_NUMBER_FILE ] || echo "1" > $BUILD_NUMBER_FILE
-    
-    mkdir $RELEASE_DIR $DEBUG_DIR
+    if [ "$CLEAN_ALL" == "clean" ]; then
+        [ -e $PACKAGES_DIR ] && rm -rf $PACKAGES_DIR
+        [ -e $RELEASE_DIR ] && rm -rf $RELEASE_DIR
+        [ -e $DEBUG_DIR ] && rm -rf $DEBUG_DIR
+        [ -e $PROJECT_DIR/CMakeLists.txt ] && rm -f $PROJECT_DIR/CMakeLists.txt
+        
+        mkdir $RELEASE_DIR $DEBUG_DIR
+    fi
 
     # increase build number
+    [ -e $BUILD_NUMBER_FILE ] || echo "1" > $BUILD_NUMBER_FILE
     build_n=`cat $BUILD_NUMBER_FILE`
 
     build_n=$(($build_n+1))
@@ -54,12 +56,14 @@ function build
     cd $RELEASE_DIR
     cmake -DCMAKE_BUILD_TYPE=Release ..
     cmake --build .
+    ctest
     cd -
 
     # build debug
     cd $DEBUG_DIR
     cmake -DCMAKE_BUILD_TYPE=Debug ..
     cmake --build .
+    ctest
     cd -
 }
 

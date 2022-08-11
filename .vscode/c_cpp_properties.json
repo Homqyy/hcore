@@ -5,7 +5,8 @@
             "includePath": [
                 "/usr/include/**",
                 "${workspaceFolder}/src/",
-                "${workspaceFolder}/include/"
+                "${workspaceFolder}/include/",
+                "${workspaceFolder}/googletest/googletest/include"
             ],
             "defines": [
                 "_SDE_DEBUG"

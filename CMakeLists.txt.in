@@ -1,9 +1,29 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(hcore VERSION @@{VERSION}@@ LANGUAGES C)
+project(hcore VERSION @@{VERSION}@@ LANGUAGES C CXX)
 
 # init
 
 set(CMAKE_DEBUG_POSTFIX -debug)
+## GoogleTest requires at least C++14
+set(CMAKE_CXX_STANDARD 14)
+
+if (DEFINED ENV{HCORE_INSTALL_LIBDIR})
+    set(HCORE_INSTALL_LIBDIR $ENV{HCORE_INSTALL_LIBDIR})
+else ()
+    set(HCORE_INSTALL_LIBDIR lib)
+endif ()
+
+if (DEFINED ENV{HCORE_INSTALL_INCLUDEDIR})
+    set(HCORE_INSTALL_INCLUDEDIR $ENV{HCORE_INSTALL_INCLUDEDIR})
+else ()
+    set(HCORE_INSTALL_INCLUDEDIR include)
+endif ()
+
+if (DEFINED ENV{HCORE_INSTALL_CMAKEDIR})
+    set(HCORE_INSTALL_CMAKEDIR $ENV{HCORE_INSTALL_CMAKEDIR})
+else ()
+    set(HCORE_INSTALL_CMAKEDIR lib/cmake/hcore)
+endif ()
 
 aux_source_directory(src SOURCE)
 
@@ -16,17 +36,27 @@ set_target_properties(hcore PROPERTIES
     SOVERSION "1")
 
 configure_file(hcore_config.h.in hcore_config.h)
-target_include_directories(hcore PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
+target_include_directories(hcore PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(hcore INTERFACE $<INSTALL_INTERFACE:${HCORE_INSTALL_INCLUDEDIR}>)
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    target_compile_definitions(hcore PRIVATE _HCORE_DEBUG)
+    target_compile_definitions(hcore PUBLIC _HCORE_DEBUG)
+    target_compile_options(hcore PRIVATE -g -O0)
 endif()
 
-# TODO: test
-# include(CTest)
-# enable_testing()
+# Test
+enable_testing()
+
+add_subdirectory(googletest)
+include(GoogleTest)
+
+## Test Cases
+add_executable(test_all tests/test_astring.cpp)
+target_include_directories(test_all PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(test_all PRIVATE GTest::gtest_main hcore)
+gtest_discover_tests(test_all)
+
+# Package
 
 include(CMakePackageConfigHelpers)
 # generate the config file that is includes the exports
@@ -46,21 +76,22 @@ write_basic_package_version_file(
 # install
 install(TARGETS hcore 
     EXPORT HCORE_ARCHIVE
-    ARCHIVE DESTINATION lib)
+    ARCHIVE DESTINATION ${HCORE_INSTALL_LIBDIR})
 install(FILES ${PROJECT_BINARY_DIR}/hcore_config.h
-    DESTINATION include)
+    DESTINATION ${HCORE_INSTALL_INCLUDEDIR})
 install(DIRECTORY include/
-    DESTINATION include
+    DESTINATION ${HCORE_INSTALL_INCLUDEDIR}
     FILES_MATCHING PATTERN "*.h")
 
 install(EXPORT HCORE_ARCHIVE
     FILE hcore.cmake
-    DESTINATION lib/cmake/hcore)
+    DESTINATION ${HCORE_INSTALL_CMAKEDIR})
 
 ## install the configuration file
 install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/HCoreConfig.cmake
-    DESTINATION lib/cmake/hcore
+    ${CMAKE_CURRENT_BINARY_DIR}/HCoreConfigVersion.cmake
+    DESTINATION ${HCORE_INSTALL_CMAKEDIR}
     )
 
 # pack
