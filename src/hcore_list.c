@@ -16,15 +16,23 @@
 
 #include <stdlib.h>
 
+static void *hcore_list_alloc(hcore_pool_t *pool, size_t size);
+static void *hcore_list_realloc(hcore_pool_t *pool, void *p, size_t old_size,
+                                size_t new_size);
+
 hcore_int_t
-hcore_list_init(hcore_pool_t *pool, hcore_list_t *list, hcore_list_compare_pt compare)
+hcore_list_init(hcore_pool_t *pool, hcore_list_t *list,
+                hcore_list_compare_pt compare)
 {
     list->num_reserved = HCORE_LIST_INIT_NUM_RESERVED;
     list->num_item     = 0;
     list->pool         = pool;
 
-    list->p = hcore_palloc(list->pool, sizeof(void *) * list->num_reserved);
-    if (list->pool == NULL) { return HCORE_ERROR; }
+    list->p = hcore_list_alloc(list->pool, sizeof(void *) * list->num_reserved);
+    if (list->pool == NULL)
+    {
+        return HCORE_ERROR;
+    }
 
     list->cmp    = compare;
     list->sorted = 1;
@@ -32,16 +40,49 @@ hcore_list_init(hcore_pool_t *pool, hcore_list_t *list, hcore_list_compare_pt co
     return HCORE_OK;
 }
 
+static inline void *
+hcore_list_alloc(hcore_pool_t *pool, size_t size)
+{
+    if (pool)
+    {
+        return hcore_palloc(pool, size);
+    }
+    else
+    {
+        return malloc(size);
+    }
+}
+
+static inline void *
+hcore_list_realloc(hcore_pool_t *pool, void *p, size_t old_size,
+                   size_t new_size)
+{
+    if (pool)
+    {
+        return hcore_prealloc(pool, p, old_size, new_size);
+    }
+    else
+    {
+        return realloc(p, new_size);
+    }
+}
+
 hcore_list_t *
 hcore_list_create(hcore_pool_t *pool, hcore_list_compare_pt compare)
 {
     hcore_list_t *list;
 
-    list = hcore_palloc(pool, sizeof(hcore_list_t));
+    list = hcore_list_alloc(pool, sizeof(hcore_list_t));
 
-    if (list == NULL) { return NULL; }
+    if (list == NULL)
+    {
+        return NULL;
+    }
 
-    if (hcore_list_init(pool, list, compare) != HCORE_OK) { return NULL; }
+    if (hcore_list_init(pool, list, compare) != HCORE_OK)
+    {
+        return NULL;
+    }
 
     return list;
 }
@@ -53,7 +94,10 @@ hcore_list_add(hcore_list_t *list, void *p)
     unsigned int old_num;
 
 
-    if (list == NULL || p == NULL) { return HCORE_ERROR; }
+    if (list == NULL || p == NULL)
+    {
+        return HCORE_ERROR;
+    }
 
     i = list->num_item;
     list->num_item++;
@@ -63,9 +107,13 @@ hcore_list_add(hcore_list_t *list, void *p)
         old_num            = list->num_reserved;
         list->num_reserved = list->num_reserved * 2;
 
-        list->p = hcore_prealloc(list->pool, list->p, old_num * sizeof(void *),
+        list->p =
+            hcore_list_realloc(list->pool, list->p, old_num * sizeof(void *),
                                list->num_reserved * sizeof(void *));
-        if (list->p == NULL) { return HCORE_ERROR; }
+        if (list->p == NULL)
+        {
+            return HCORE_ERROR;
+        }
     }
 
     list->p[i] = p;
@@ -79,7 +127,10 @@ void
 hcore_list_sort(hcore_list_t *list)
 {
     // Validate arguments
-    if (list == NULL || list->cmp == NULL) { return; }
+    if (list == NULL || list->cmp == NULL)
+    {
+        return;
+    }
 
     qsort(list->p, list->num_item, sizeof(void *),
           (int (*)(const void *, const void *))list->cmp);
@@ -96,7 +147,10 @@ hcore_list_insert(hcore_list_t *list, void *p)
     unsigned int pos;
 
     // Validate arguments
-    if (list == NULL || p == NULL) { return HCORE_ERROR; }
+    if (list == NULL || p == NULL)
+    {
+        return HCORE_ERROR;
+    }
 
     if (list->cmp == NULL)
     {
@@ -106,7 +160,10 @@ hcore_list_insert(hcore_list_t *list, void *p)
     }
 
     // Sort immediately if it is not sorted
-    if (!list->sorted) { hcore_list_sort(list); }
+    if (!list->sorted)
+    {
+        hcore_list_sort(list);
+    }
 
     low  = 0;
     high = HCORE_LIST_NUM(list) - 1;
@@ -135,7 +192,10 @@ hcore_list_insert(hcore_list_t *list, void *p)
         }
     }
 
-    if (pos == HCORE_INFINITE) { pos = low; }
+    if (pos == HCORE_INFINITE)
+    {
+        pos = low;
+    }
 
     list->num_item++;
     if (list->num_item > list->num_reserved)
@@ -143,7 +203,8 @@ hcore_list_insert(hcore_list_t *list, void *p)
         old_num = list->num_reserved;
         list->num_reserved *= 2;
 
-        list->p = hcore_prealloc(list->pool, list->p, sizeof(void *) * old_num,
+        list->p =
+            hcore_list_realloc(list->pool, list->p, sizeof(void *) * old_num,
                                sizeof(void *) * list->num_reserved);
     }
 
@@ -167,16 +228,28 @@ hcore_list_delete(hcore_list_t *list, void *p)
     unsigned int old_num;
 
     // Validate arguments
-    if (list == NULL || p == NULL) { return HCORE_ERROR; }
+    if (list == NULL || p == NULL)
+    {
+        return HCORE_ERROR;
+    }
 
     for (i = 0; i < list->num_item; i++)
     {
-        if (list->p[i] == p) { break; }
+        if (list->p[i] == p)
+        {
+            break;
+        }
     }
-    if (i == list->num_item) { return HCORE_ERROR; }
+    if (i == list->num_item)
+    {
+        return HCORE_ERROR;
+    }
 
     n = i;
-    for (i = n; i < (list->num_item - 1); i++) { list->p[i] = list->p[i + 1]; }
+    for (i = n; i < (list->num_item - 1); i++)
+    {
+        list->p[i] = list->p[i + 1];
+    }
 
     list->num_item--;
 
@@ -187,9 +260,9 @@ hcore_list_delete(hcore_list_t *list, void *p)
             old_num            = list->num_reserved;
             list->num_reserved = list->num_reserved / 2;
 
-            list->p =
-                hcore_prealloc(list->pool, list->p, sizeof(void *) * old_num,
-                             sizeof(void *) * list->num_reserved);
+            list->p = hcore_list_realloc(list->pool, list->p,
+                                         sizeof(void *) * old_num,
+                                         sizeof(void *) * list->num_reserved);
         }
     }
 
@@ -202,15 +275,18 @@ hcore_list_delete_all(hcore_list_t *list)
     unsigned int old_num;
 
     // Validate arguments
-    if (list == NULL) { return; }
+    if (list == NULL)
+    {
+        return;
+    }
 
     old_num = list->num_reserved;
 
     list->num_item     = 0;
     list->num_reserved = HCORE_LIST_INIT_NUM_RESERVED;
 
-    list->p = hcore_prealloc(list->pool, list->p, sizeof(void *) * old_num,
-                           sizeof(void *) * HCORE_LIST_INIT_NUM_RESERVED);
+    list->p = hcore_list_realloc(list->pool, list->p, sizeof(void *) * old_num,
+                                 sizeof(void *) * HCORE_LIST_INIT_NUM_RESERVED);
 }
 
 // Search in the list
@@ -219,8 +295,14 @@ hcore_list_search(hcore_list_t *list, void *target)
 {
     void **ret;
     // Validate arguments
-    if (list == NULL || target == NULL) { return NULL; }
-    if (list->cmp == NULL) { return NULL; }
+    if (list == NULL || target == NULL)
+    {
+        return NULL;
+    }
+    if (list->cmp == NULL)
+    {
+        return NULL;
+    }
 
     // Check the sort
     if (list->sorted == 0)
@@ -232,9 +314,36 @@ hcore_list_search(hcore_list_t *list, void *target)
     ret = (void **)bsearch(&target, list->p, list->num_item, sizeof(void *),
                            (int (*)(const void *, const void *))list->cmp);
 
-    if (ret != NULL) { return *ret; }
+    if (ret != NULL)
+    {
+        return *ret;
+    }
     else
     {
         return NULL;
+    }
+}
+
+void
+hcore_list_deinit(hcore_list_t *list)
+{
+    if (list == NULL) return;
+
+    if (list->pool == NULL)
+    {
+        free(list->p);
+    }
+}
+
+void
+hcore_list_destroy(hcore_list_t *list)
+{
+    if (list == NULL) return;
+
+    hcore_list_deinit(list);
+
+    if (list->pool == NULL)
+    {
+        free(list);
     }
 }

@@ -9,7 +9,7 @@
                 "${workspaceFolder}/googletest/googletest/include"
             ],
             "defines": [
-                "_SDE_DEBUG"
+                "_HCORE_DEBUG"
             ],
             "cStandard": "gnu99",
             "cppStandard": "${default}",
