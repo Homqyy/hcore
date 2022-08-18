@@ -163,6 +163,7 @@ hcore_debug_create_mnode(const char *name, size_t size)
 
     if (node == NULL) return NULL;
 
+    // TODO: fill junk
     memset(node, 0x00, sizeof(hcore_debug_mnode_t));
 
     node->magic = HCORE_DEBUG_MAGIC_NUM;
@@ -252,7 +253,7 @@ hcore_create_debug(hcore_log_t *log, hcore_uint_t max_stack_num)
     db->pool          = pool;
     db->max_stack_num = max_stack_num;
 
-    db->mlist = hcore_list_create(NULL, hcore_debug_mnode_cmp);
+    db->mlist = hcore_create_list(NULL, hcore_debug_mnode_cmp);
     if (db->mlist == NULL) goto error;
 
     return db;
@@ -286,7 +287,7 @@ hcore_destroy_debug(hcore_debug_t *db)
         hcore_debug_destroy_mnode(db->mlist->p[i]);
     }
 
-    hcore_list_destroy(db->mlist);
+    hcore_destroy_list(db->mlist);
 
     hcore_destroy_pool(db->pool);
 }

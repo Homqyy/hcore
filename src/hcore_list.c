@@ -21,7 +21,7 @@ static void *hcore_list_realloc(hcore_pool_t *pool, void *p, size_t old_size,
                                 size_t new_size);
 
 hcore_int_t
-hcore_list_init(hcore_pool_t *pool, hcore_list_t *list,
+hcore_init_list(hcore_pool_t *pool, hcore_list_t *list,
                 hcore_list_compare_pt compare)
 {
     list->num_reserved = HCORE_LIST_INIT_NUM_RESERVED;
@@ -68,7 +68,7 @@ hcore_list_realloc(hcore_pool_t *pool, void *p, size_t old_size,
 }
 
 hcore_list_t *
-hcore_list_create(hcore_pool_t *pool, hcore_list_compare_pt compare)
+hcore_create_list(hcore_pool_t *pool, hcore_list_compare_pt compare)
 {
     hcore_list_t *list;
 
@@ -79,7 +79,7 @@ hcore_list_create(hcore_pool_t *pool, hcore_list_compare_pt compare)
         return NULL;
     }
 
-    if (hcore_list_init(pool, list, compare) != HCORE_OK)
+    if (hcore_init_list(pool, list, compare) != HCORE_OK)
     {
         return NULL;
     }
@@ -325,7 +325,7 @@ hcore_list_search(hcore_list_t *list, void *target)
 }
 
 void
-hcore_list_deinit(hcore_list_t *list)
+hcore_deinit_list(hcore_list_t *list)
 {
     if (list == NULL) return;
 
@@ -336,11 +336,11 @@ hcore_list_deinit(hcore_list_t *list)
 }
 
 void
-hcore_list_destroy(hcore_list_t *list)
+hcore_destroy_list(hcore_list_t *list)
 {
     if (list == NULL) return;
 
-    hcore_list_deinit(list);
+    hcore_deinit_list(list);
 
     if (list->pool == NULL)
     {

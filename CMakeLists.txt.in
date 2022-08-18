@@ -38,6 +38,7 @@ set_target_properties(hcore PROPERTIES
 configure_file(hcore_config.h.in hcore_config.h)
 target_include_directories(hcore PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(hcore INTERFACE $<INSTALL_INTERFACE:${HCORE_INSTALL_INCLUDEDIR}>)
+target_link_libraries(hcore INTERFACE rt)
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     target_compile_definitions(hcore PUBLIC _HCORE_DEBUG)
@@ -51,7 +52,8 @@ add_subdirectory(googletest)
 include(GoogleTest)
 
 ## Test Cases
-add_executable(test_all tests/test_astring.cpp)
+aux_source_directory(tests TEST_SOURCE)
+add_executable(test_all ${TEST_SOURCE})
 target_include_directories(test_all PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(test_all PRIVATE GTest::gtest_main hcore)
 gtest_discover_tests(test_all)

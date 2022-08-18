@@ -10,7 +10,7 @@ CONFIG_FILE=$PROJECT_DIR/.config
 RELEASE_DIR=$PROJECT_DIR/release
 DEBUG_DIR=$PROJECT_DIR/debug
 PACKAGES_DIR=$PROJECT_DIR/packages
-CLEAN_ALL=$1
+ACTION=$1
 
 ############################## Function
 
@@ -18,7 +18,7 @@ BUILD_NUMBER_FILE=$PROJECT_DIR/.build_number
 
 function init
 {
-    if [ "$CLEAN_ALL" == "clean" ]; then
+    if [ "$ACTION" == "clean" ]; then
         [ -e $PACKAGES_DIR ] && rm -rf $PACKAGES_DIR
         [ -e $RELEASE_DIR ] && rm -rf $RELEASE_DIR
         [ -e $DEBUG_DIR ] && rm -rf $DEBUG_DIR
@@ -51,17 +51,16 @@ function init
 
 function build
 {
-
-    # build release
-    cd $RELEASE_DIR
-    cmake -DCMAKE_BUILD_TYPE=Release ..
+    # build debug
+    cd $DEBUG_DIR
+    cmake -DCMAKE_BUILD_TYPE=Debug ..
     cmake --build .
     ctest
     cd -
 
-    # build debug
-    cd $DEBUG_DIR
-    cmake -DCMAKE_BUILD_TYPE=Debug ..
+    # build release
+    cd $RELEASE_DIR
+    cmake -DCMAKE_BUILD_TYPE=Release ..
     cmake --build .
     ctest
     cd -

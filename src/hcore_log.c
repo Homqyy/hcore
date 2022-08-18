@@ -172,14 +172,14 @@ hcore_open_log(hcore_log_t *log, char *log_file, hcore_int_t level)
     if (strncmp(log_file, HCORE_LOG_FILE_STDOUT, sizeof(HCORE_LOG_FILE_STDOUT))
         == 0)
     {
-        fd       = STDOUT_FILENO;
+        fd       = dup(STDOUT_FILENO);
         internal = 1;
     }
     else if (strncmp(log_file, HCORE_LOG_FILE_STDERR,
                      sizeof(HCORE_LOG_FILE_STDERR))
              == 0)
     {
-        fd       = STDERR_FILENO;
+        fd       = dup(STDERR_FILENO);
         internal = 1;
     }
     else
@@ -191,6 +191,8 @@ hcore_open_log(hcore_log_t *log, char *log_file, hcore_int_t level)
             return HCORE_ERROR;
         }
     }
+
+    hcore_memzero(log, sizeof(hcore_log_t));
 
     log->fd        = fd;
     log->log_level = level;
@@ -224,11 +226,9 @@ hcore_create_log(hcore_pool_t *pool, char *log_file, hcore_int_t level)
 void
 hcore_destroy_log(hcore_log_t *log)
 {
-    if (log->internal) return;
-
     if (close(log->fd) == -1)
     {
-        fprintf(stderr, "close fd of '%s' failed: %s\r\n", log->filename,
-                strerror(errno));
+        fprintf(stderr, "close fd(#%d) of '%s' failed: %s\r\n", log->fd,
+                log->filename, strerror(errno));
     }
 }

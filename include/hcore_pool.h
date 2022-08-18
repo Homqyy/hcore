@@ -25,38 +25,58 @@ typedef struct hcore_pool_large_s   hcore_pool_large_t;
 typedef struct hcore_pool_data_s    hcore_pool_data_t;
 typedef struct hcore_pool_cleanup_s hcore_pool_cleanup_t;
 typedef void (*hcore_pool_clean_handler_pt)(void *data);
+typedef void *(*hcore_pool_alloc_pt)(void *pool, size_t size);
+typedef void (*hcore_pool_free_pt)(void *pool, void *p);
+typedef void (*hcore_pool_destroy_pt)(void *pool);
 
 struct hcore_pool_cleanup_s
 {
     hcore_pool_clean_handler_pt handler;
-    void *                    data;
-    hcore_pool_cleanup_t *      next;
+    void                       *data;
+    hcore_pool_cleanup_t       *next;
 };
 
 struct hcore_pool_large_s
 {
     struct hcore_pool_large_s *next;
-    void *                   alloc;
+    void                      *alloc;
 };
 
 struct hcore_pool_data_s
 {
-    u_char *    last;
-    u_char *    end;
+    u_char       *last;
+    u_char       *end;
     hcore_pool_t *next;
     hcore_uint_t  failed;
 };
 
+struct hcore_custom_pool_s
+{
+    void                 *pool;
+    hcore_pool_alloc_pt   alloc;
+    hcore_pool_free_pt    free;
+    hcore_pool_destroy_pt destroy;
+};
+
 struct hcore_pool_s
 {
+    hcore_custom_pool_t custom;
+
     hcore_pool_data_t     d;
-    size_t              max;
-    hcore_pool_t *        current;
-    hcore_pool_large_t *  large;
-    hcore_log_t *         log;
-    hcore_chain_t *       chain;
+    size_t                max;
+    hcore_pool_t         *current;
+    hcore_pool_large_t   *large;
+    hcore_log_t          *log;
+    hcore_chain_t        *chain;
     hcore_pool_cleanup_t *cleanup;
+
+    hcore_uint_t customed : 1;
 };
+
+hcore_pool_t *hcore_create_custom_pool(hcore_log_t *log, void *pool,
+                                       hcore_pool_alloc_pt   alloc,
+                                       hcore_pool_free_pt    free,
+                                       hcore_pool_destroy_pt destroy);
 
 /**
  * @brief  创建内存池
@@ -131,7 +151,8 @@ void *hcore_pcalloc(hcore_pool_t *pool, size_t size);
  * 成功：返回分配后的空间地址
  * 失败：NULL
  */
-void *hcore_prealloc(hcore_pool_t *pool, void *p, size_t old_size, size_t new_size);
+void *hcore_prealloc(hcore_pool_t *pool, void *p, size_t old_size,
+                     size_t new_size);
 
 /**
  * @brief  pool align alloc; 申请一块'size'大小的空间，地址进行排列
@@ -142,11 +163,12 @@ void *hcore_prealloc(hcore_pool_t *pool, void *p, size_t old_size, size_t new_si
  */
 #define hcore_palloc(pool, size) hcore_pnalloc(pool, size)
 
-hcore_chain_t *       hcore_alloc_chain(hcore_pool_t *pool);
-void                hcore_free_chain(hcore_pool_t *pool, hcore_chain_t *cl);
-hcore_chain_t *       hcore_alloc_chain_with_buf(hcore_pool_t *pool);
-void                hcore_free_chain_hold_buf(hcore_pool_t *pool, hcore_chain_t *cl);
-hcore_buf_t *         hcore_alloc_buf(hcore_pool_t *pool, size_t size);
-hcore_pool_cleanup_t *hcore_pool_cleanup_add(hcore_pool_t *pool, size_t data_size);
+hcore_chain_t *hcore_alloc_chain(hcore_pool_t *pool);
+void           hcore_free_chain(hcore_pool_t *pool, hcore_chain_t *cl);
+hcore_chain_t *hcore_alloc_chain_with_buf(hcore_pool_t *pool);
+void           hcore_free_chain_hold_buf(hcore_pool_t *pool, hcore_chain_t *cl);
+hcore_buf_t   *hcore_alloc_buf(hcore_pool_t *pool, size_t size);
+hcore_pool_cleanup_t *hcore_pool_cleanup_add(hcore_pool_t *pool,
+                                             size_t        data_size);
 
 #endif // !_HCORE_POOL_H_INCLUDED_

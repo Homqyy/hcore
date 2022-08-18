@@ -21,6 +21,21 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+/* must support atomic in gcc */
+#define HCORE_HAVE_GCC_ATOMIC
+
+#ifdef HCORE_HAVE_GCC_ATOMIC
+
+#define HCORE_HAVE_ATOMIC_OPS  1
+
+/* GCC 4.1 builtin atomic operations */
+
+#define HCORE_ATOMIC_T_LEN (sizeof("-9223372036854775808") - 1)
+
+#endif // HCORE_HAVE_GCC_ATOMIC
+
+#define HCORE_MACHINE_ALIGN 8
+
 #ifndef IOV_MAX
 #define IOV_MAX 16
 #endif

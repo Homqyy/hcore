@@ -53,7 +53,8 @@ hcore_realloc(void *ptr, size_t size)
 {
 #ifdef _HCORE_DEBUG
     // create new
-    hcore_debug_mnode_t *new_node = hcore_debug_create_mnode("hcore_realloc", size);
+    hcore_debug_mnode_t *new_node =
+        hcore_debug_create_mnode("hcore_realloc", size);
     if (new_node == NULL) return NULL;
 
     if (ptr)
@@ -85,10 +86,4 @@ hcore_free(void *ptr)
 #else
     free(ptr);
 #endif
-}
-
-int
-hcore_getpagesize(void)
-{
-    return getpagesize();
 }

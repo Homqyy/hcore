@@ -52,7 +52,7 @@ struct hcore_list_s
  * 初始化成功：HCORE_OK
  * 初始化失败：HCORE_ERROR
  */
-hcore_int_t hcore_list_init(hcore_pool_t *pool, hcore_list_t *list,
+hcore_int_t hcore_init_list(hcore_pool_t *pool, hcore_list_t *list,
                             hcore_list_compare_pt compare);
 
 /**
@@ -64,14 +64,14 @@ hcore_int_t hcore_list_init(hcore_pool_t *pool, hcore_list_t *list,
  * 创建成功：链表结构
  * 创建失败：NULL
  */
-hcore_list_t *hcore_list_create(hcore_pool_t         *pool,
+hcore_list_t *hcore_create_list(hcore_pool_t         *pool,
                                 hcore_list_compare_pt compare);
 
 /**
  * @brief  添加节点'p'到链表中，此动作不会触发排序
  * @note
  * @param  *list:
- * 链表结构，由'hcore_list_create()'创建或'hcore_list_init()'初始化
+ * 链表结构，由'hcore_create_list()'创建或'hcore_init_list()'初始化
  * @param  *p: 待添加的节点
  * @retval
  */
@@ -122,18 +122,18 @@ void *hcore_list_search(hcore_list_t *list, void *target);
 
 /**
  * @brief deinit list
- * @note invoke it to release resource if 'list' from 'hcore_list_init' and
+ * @note invoke it to release resource if 'list' from 'hcore_init_list' and
  * 'pool' parametric is NULL
  * @param list list object
  */
-void hcore_list_deinit(hcore_list_t *list);
+void hcore_deinit_list(hcore_list_t *list);
 
 /**
  * @brief destroy list
- * @note invoke it to release resource if 'list' from 'hcore_list_create' and
+ * @note invoke it to release resource if 'list' from 'hcore_create_list' and
  * 'pool' parametric is NULL
  * @param list list object
  */
-void hcore_list_destroy(hcore_list_t *list);
+void hcore_destroy_list(hcore_list_t *list);
 
 #endif // !_HCORE_LIST_H_INCLUDED_

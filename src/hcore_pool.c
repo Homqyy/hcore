@@ -128,6 +128,12 @@ hcore_destroy_pool(hcore_pool_t *pool)
         }
     }
 
+    if (pool->customed)
+    {
+        pool->custom.destroy(pool->custom.pool);
+        return;
+    }
+
     for (l = pool->large; l; l = l->next)
     {
         if (l->alloc)
@@ -169,11 +175,37 @@ hcore_create_pool(size_t size, hcore_log_t *log)
     size   = size - sizeof(hcore_pool_t);
     p->max = (size < hcore_pagesize - 1) ? size : hcore_pagesize - 1;
 
-    p->current = p;
-    p->chain   = NULL;
-    p->large   = NULL;
-    p->log     = log;
-    p->cleanup = NULL;
+    p->current  = p;
+    p->chain    = NULL;
+    p->large    = NULL;
+    p->log      = log;
+    p->cleanup  = NULL;
+    p->customed = 0;
+
+    return p;
+}
+
+hcore_pool_t *
+hcore_create_custom_pool(hcore_log_t *log, void *pool,
+                         hcore_pool_alloc_pt alloc, hcore_pool_free_pt free,
+                         hcore_pool_destroy_pt destroy)
+{
+    hcore_assert(log && pool && alloc && free && destroy);
+
+    if (log == NULL || pool == NULL || alloc == NULL || free == NULL
+        || destroy == NULL)
+    {
+        return NULL;
+    }
+
+    hcore_pool_t *p = hcore_create_pool(sizeof(hcore_pool_t), log);
+    if (p == NULL) return NULL;
+
+    p->custom.pool    = pool;
+    p->custom.alloc   = alloc;
+    p->custom.free    = free;
+    p->custom.destroy = destroy;
+    p->customed       = 1;
 
     return p;
 }
@@ -227,6 +259,11 @@ hcore_pcalloc(hcore_pool_t *pool, size_t size)
 void *
 hcore_pnalloc(hcore_pool_t *pool, size_t size)
 {
+    if (pool->customed)
+    {
+        return pool->custom.alloc(pool->custom.pool, size);
+    }
+
     if (size <= pool->max)
     {
         return hcore_palloc_small(pool, size, 0);
@@ -351,6 +388,12 @@ hcore_int_t
 hcore_pfree(hcore_pool_t *pool, void *p)
 {
     hcore_pool_large_t *l;
+
+    if (pool->customed)
+    {
+        pool->custom.free(pool->custom.pool, p);
+        return HCORE_OK;
+    }
 
     for (l = pool->large; l; l = l->next)
     {

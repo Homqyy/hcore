@@ -1,0 +1,25 @@
+{
+    "files.associations": {
+        "**/*.html": "html",
+        "**/templates/**/*.html": "django-html",
+        "**/templates/**/*": "django-txt",
+        "**/requirements{/**,*}.{txt,in}": "pip-requirements",
+        "*.c": "c",
+        "*.h": "c",
+        "*.tcc": "c",
+        "forward_list": "c",
+        "list": "c",
+        "unordered_map": "c",
+        "unordered_set": "c",
+        "memory": "c",
+        "fstream": "c",
+        "initializer_list": "c",
+        "streambuf": "c",
+        "tuple": "c",
+        "optional": "c",
+        "numeric": "c",
+        "sstream": "c",
+        "stdexcept": "c",
+        "utility": "c"
+    }
+}

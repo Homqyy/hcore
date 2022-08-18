@@ -46,14 +46,14 @@ enum
 typedef struct
 {
     size_t size;
-    void * data;
+    void  *data;
 } hcore_pack_elem_value_data_t; // Data
 
 typedef struct
 {
     hcore_str_t            name;   // Element name
     hcore_pack_elem_type_e type;   // Type
-    hcore_array_t *        values; // values
+    hcore_array_t         *values; // values
 
     hcore_pool_t *pool;
 } hcore_pack_elem_t;
@@ -71,7 +71,7 @@ typedef struct
     /* internal data: for buf */
 
     hcore_uchar_t *buf;
-    size_t       total_size;
+    size_t         total_size;
 
     /* internal data: state variable */
 
@@ -86,7 +86,7 @@ typedef struct
     unsigned int cur_value_num; // number of current value
     unsigned int value_num;
     unsigned int elem_type;
-    hcore_str_t    elem_name;
+    hcore_str_t  elem_name;
 
     hcore_pack_elem_t *cur_elem;
 } hcore_pack_t;
@@ -123,7 +123,7 @@ void hcore_pack_destroy(hcore_pack_t *p);
  * 添加失败：HCORE_ERROR
  */
 ssize_t hcore_pack_read(const hcore_uchar_t *buffer, const hcore_uchar_t *last,
-                      hcore_pack_t *pack);
+                        hcore_pack_t *pack);
 
 /**
  * @brief 将PACK结构转位buffer，此次转化用到的空间由PACK结构中的pool提供。
@@ -148,7 +148,8 @@ hcore_uchar_t *hcore_pack_write(hcore_pack_t *pack, size_t *size);
  * 添加成功：HCORE_OK
  * 添加失败：HCORE_ERROR
  */
-hcore_int_t hcore_pack_add_int(hcore_pack_t *p, const char *name, unsigned int i);
+hcore_int_t hcore_pack_add_int(hcore_pack_t *p, const char *name,
+                               unsigned int i);
 
 /**
  * @brief  添加一个字符串到'name'中；该接口不会携带'\0'
@@ -161,7 +162,7 @@ hcore_int_t hcore_pack_add_int(hcore_pack_t *p, const char *name, unsigned int i
  * 添加失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_add_str(hcore_pack_t *p, const char *name,
-                           const hcore_str_t *str);
+                               const hcore_str_t *str);
 
 /**
  * @brief  添加一个字符串到'name'中；该接口会携带'\0'过去
@@ -174,7 +175,7 @@ hcore_int_t hcore_pack_add_str(hcore_pack_t *p, const char *name,
  * 添加失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_add_str_char(hcore_pack_t *p, const char *name,
-                                const char *str);
+                                    const char *str);
 
 /**
  * @brief  添加一个二进制数据到'name'中
@@ -187,8 +188,8 @@ hcore_int_t hcore_pack_add_str_char(hcore_pack_t *p, const char *name,
  * 添加成功：HCORE_OK
  * 添加失败：HCORE_ERROR
  */
-hcore_int_t hcore_pack_add_data(hcore_pack_t *p, const char *name, const void *data,
-                            size_t size);
+hcore_int_t hcore_pack_add_data(hcore_pack_t *p, const char *name,
+                                const void *data, size_t size);
 
 /**
  * @brief  获取'name'的首个整形数据
@@ -200,7 +201,8 @@ hcore_int_t hcore_pack_add_data(hcore_pack_t *p, const char *name, const void *d
  * 获取成功：HCORE_OK
  * 获取失败：HCORE_ERROR
  */
-hcore_int_t hcore_pack_get_int(hcore_pack_t *p, const char *name, unsigned int *i);
+hcore_int_t hcore_pack_get_int(hcore_pack_t *p, const char *name,
+                               unsigned int *i);
 
 /**
  * @brief  获取'name'的所有整形数据，返回的数据以数组的形式存放在 'i' 中，
@@ -216,7 +218,7 @@ hcore_int_t hcore_pack_get_int(hcore_pack_t *p, const char *name, unsigned int *
  * 获取失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_get_int_array(hcore_pack_t *p, const char *name,
-                                 unsigned int **i, hcore_uint_t *num);
+                                     unsigned int **i, hcore_uint_t *num);
 
 /**
  * @brief  获取'name'的首个字符串
@@ -228,7 +230,8 @@ hcore_int_t hcore_pack_get_int_array(hcore_pack_t *p, const char *name,
  * 获取成功：HCORE_OK
  * 获取失败：HCORE_ERROR
  */
-hcore_int_t hcore_pack_get_str(hcore_pack_t *p, const char *name, hcore_str_t *str);
+hcore_int_t hcore_pack_get_str(hcore_pack_t *p, const char *name,
+                               hcore_str_t *str);
 
 /**
  * @brief  获取'name'的所有字符串，返回的数据以数组的形式存放在 'str' 中，
@@ -244,7 +247,7 @@ hcore_int_t hcore_pack_get_str(hcore_pack_t *p, const char *name, hcore_str_t *s
  * 获取失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_get_str_array(hcore_pack_t *p, const char *name,
-                                 hcore_str_t **str, hcore_uint_t *num);
+                                     hcore_str_t **str, hcore_uint_t *num);
 
 /**
  * @brief  获取'name'的首个二进制数据
@@ -258,7 +261,7 @@ hcore_int_t hcore_pack_get_str_array(hcore_pack_t *p, const char *name,
  * 获取失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_get_data(hcore_pack_t *p, const char *name, void **data,
-                            size_t *size);
+                                size_t *size);
 
 /**
  * @brief  获取'name'的所有二进制数据，返回的数据1以数组的形式存放在'data'中，
@@ -274,8 +277,8 @@ hcore_int_t hcore_pack_get_data(hcore_pack_t *p, const char *name, void **data,
  * 获取失败：HCORE_ERROR
  */
 hcore_int_t hcore_pack_get_data_array(hcore_pack_t *p, const char *name,
-                                  hcore_pack_elem_value_data_t **data,
-                                  hcore_uint_t *                 num);
+                                      hcore_pack_elem_value_data_t **data,
+                                      hcore_uint_t                  *num);
 
 
 int hcore_pack_cmp_name(const void *p1, const void *p2);
@@ -293,8 +296,11 @@ hcore_pack_init(hcore_pack_t *p, hcore_pool_t *pool, hcore_uint_t max)
 {
     p->pool     = pool;
     p->max      = max;
-    p->elements = hcore_list_create(pool, hcore_pack_cmp_name);
-    if (p->elements == NULL) { return HCORE_ERROR; }
+    p->elements = hcore_create_list(pool, hcore_pack_cmp_name);
+    if (p->elements == NULL)
+    {
+        return HCORE_ERROR;
+    }
     p->phase      = hcore_pack_phase_init;
     p->need_size  = sizeof(unsigned int);
     p->total_size = 4 /* number of element */;
