@@ -68,7 +68,8 @@ function build
 
 function build_done
 {
-    cpack --config MultiCPackConfig.cmake
+    cpack --config CPackConfig-debug.cmake
+    cpack --config CPackConfig-release.cmake
 }
 
 ############################## Main

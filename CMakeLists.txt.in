@@ -87,7 +87,7 @@ install(DIRECTORY include/
 
 install(EXPORT HCORE_ARCHIVE
     FILE hcore.cmake
-    DESTINATION ${HCORE_INSTALL_CMAKEDIR})
+    DESTINATION ${HCORE_INSTALL_CMAKEDIR}/${CMAKE_BUILD_TYPE})
 
 ## install the configuration file
 install(FILES
@@ -99,5 +99,5 @@ install(FILES
 # pack
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-set(CPACK_PACKAGE_DIRECTORY packages)
+set(CPACK_PACKAGE_DIRECTORY packages/${CMAKE_BUILD_TYPE})
 include(CPack)
