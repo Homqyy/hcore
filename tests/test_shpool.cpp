@@ -378,10 +378,10 @@ TEST_F(ShpoolTest, shared)
     pid_t         pid;
     int          *node, target;
 
-    pool = hcore_create_custom_pool(
-        &log, shpoolAnonymity, (hcore_pool_alloc_pt)hcore_shpool_alloc,
-        (hcore_pool_free_pt)hcore_shpool_free,
-        (hcore_pool_destroy_pt)hcore_destroy_pool);
+    pool = hcore_create_custom_pool(&log, shpoolAnonymity,
+                                    (hcore_pool_alloc_pt)hcore_shpool_alloc,
+                                    (hcore_pool_free_pt)hcore_shpool_free,
+                                    (hcore_pool_destroy_pt)hcore_destroy_pool);
 
     if (pool == NULL) goto error;
 
@@ -407,20 +407,21 @@ TEST_F(ShpoolTest, shared)
         node = (int *)hcore_shpool_alloc(shpoolAnonymity, sizeof(int));
         if (node == NULL) goto error;
 
-        hcore_log_debug(
-            &log, 0,
-            "node: %p%N"
-            "list %p: pool %p, num_item: %ud, num_reserved %ud after alloc in suprocess",
-            node, list, list->pool, list->num_item, list->num_reserved);
+        hcore_log_debug(&log, 0,
+                        "node: %p%N"
+                        "list %p: pool %p, num_item: %ud, num_reserved %ud "
+                        "after alloc in suprocess",
+                        node, list, list->pool, list->num_item,
+                        list->num_reserved);
 
         hcore_shpool_dump(shpoolAnonymity);
 
         *node = 1024;
 
-        hcore_log_debug(
-            &log, 0,
-            "list %p: pool %p, num_item: %ud, num_reserved %ud after set node in suprocess",
-            list, list->pool, list->num_item, list->num_reserved);
+        hcore_log_debug(&log, 0,
+                        "list %p: pool %p, num_item: %ud, num_reserved %ud "
+                        "after set node in suprocess",
+                        list, list->pool, list->num_item, list->num_reserved);
 
         hcore_shpool_lock(shpoolAnonymity);
         {
@@ -456,7 +457,7 @@ TEST_F(ShpoolTest, shared)
 
     target = 1024;
 
-    node = (int *) hcore_list_search(list, &target);
+    node = (int *)hcore_list_search(list, &target);
     EXPECT_TRUE(node);
     EXPECT_EQ(*node, target);
 

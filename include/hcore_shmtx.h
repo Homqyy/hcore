@@ -17,8 +17,7 @@
 #include <hcore_types.h>
 
 /**
- * @brief must in shared memory
- *
+ * @brief the space must in shared memory
  */
 typedef struct
 {
@@ -27,7 +26,7 @@ typedef struct
 
 typedef struct
 {
-    hcore_atomic_t *lock;
+    hcore_atomic_t *lock; // point to hcore_shmtx_sh_t.lock
     hcore_uint_t    spin;
 } hcore_shmtx_t;
 
