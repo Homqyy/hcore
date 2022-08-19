@@ -24,7 +24,8 @@
 		"eamodio.gitlens",
 		"cschlosser.doxdocgen",
 		"oderwat.indent-rainbow",
-		"jeff-hykin.better-cpp-syntax"
+		"jeff-hykin.better-cpp-syntax",
+		"shd101wyy.markdown-preview-enhanced"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
