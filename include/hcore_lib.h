@@ -24,6 +24,5 @@ void *hcore_malloc(size_t size);
 void *hcore_calloc(size_t count, size_t size);
 void *hcore_realloc(void *ptr, size_t size);
 void  hcore_free(void *ptr);
-int   hcore_getpagesize(void);
 
 #endif // !_HCORE_LIB_H_INCLUDED_

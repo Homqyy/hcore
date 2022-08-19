@@ -43,7 +43,7 @@ typedef struct hcore_chain_s       hcore_chain_t;
 typedef struct hcore_buf_s         hcore_buf_t;
 
 
-#if (HCORE_HAVE_ATOMIC_OPS)
+#if (HCORE_HAVE_AUTOMIC_OPS)
 
 typedef long                         hcore_atomic_int_t;
 typedef unsigned long                hcore_atomic_uint_t;

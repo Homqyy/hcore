@@ -125,6 +125,9 @@ hcore_int_t hcore_get_slab_exact_shift(void);
 
 #define HCORE_SMP_LOCK "lock;"
 
+
+#if (HCORE_HAVE_AUTOMIC_OPS)
+
 /*
  * "cmpxchgq  r, [m]":
  *
@@ -145,7 +148,6 @@ hcore_int_t hcore_get_slab_exact_shift(void);
  *
  * The "cc" means that flags were changed.
  */
-
 static inline hcore_atomic_uint_t
 hcore_atomic_cmp_set(hcore_atomic_t *lock, hcore_atomic_uint_t old,
                      hcore_atomic_uint_t set)
@@ -190,5 +192,8 @@ hcore_atomic_fetch_add(hcore_atomic_t *value, hcore_atomic_int_t add)
 
     return add;
 }
+
+#endif // (HCORE_HAVE_AUTOMIC_OPS)
+
 
 #endif // !_HCORE_BASE_H_INCLUDED_
