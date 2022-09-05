@@ -172,7 +172,7 @@ function run_on_docker
             return 1
         fi
 
-        docker run -it --rm \
+        docker run --rm \
                 -v "${G_PROJECT_DIR}:/workspace/hcore" \
                 $g_image_id $action \
             || return 1
