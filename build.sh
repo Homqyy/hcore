@@ -8,6 +8,8 @@ G_CONFIG_FILE=$G_PROJECT_DIR/.config
 G_RELEASE_DIR=$G_PROJECT_DIR/release
 G_DEBUG_DIR=$G_PROJECT_DIR/debug
 G_PACKAGES_DIR=$G_PROJECT_DIR/packages
+G_DEBUG=
+G_RELEASE=
 
 #################################### function
 
@@ -56,27 +58,35 @@ function compile
 
     # build debug
 
-    cd $G_DEBUG_DIR
+    if [ $G_DEBUG ]; then
 
-    cmake -DCMAKE_BUILD_TYPE=Debug .. \
-        && cmake --build . \
-        || error=1
+        cd $G_DEBUG_DIR
 
-    cd -
+        cmake -DCMAKE_BUILD_TYPE=Debug .. \
+            && cmake --build . \
+            || error=1
 
-    [ $error ] && return 1
+        cd -
+
+        [ $error ] && return 1
+
+    fi
 
     # build release
 
-    cd $G_RELEASE_DIR
+    if [ $G_RELEASE ]; then
 
-    cmake -DCMAKE_BUILD_TYPE=Release .. \
-        && cmake --build . \
-        || error=1
+        cd $G_RELEASE_DIR
 
-    cd -
+        cmake -DCMAKE_BUILD_TYPE=Release .. \
+            && cmake --build . \
+            || error=1
 
-    [ $error ] && return 1
+        cd -
+
+        [ $error ] && return 1
+
+    fi
 
     return 0;
 }
@@ -85,21 +95,29 @@ function test_case
 {
     error=;
 
-    cd $G_DEBUG_DIR || error=1
+    if [ $G_DEBUG ]; then
 
-    ctest
+        cd $G_DEBUG_DIR
 
-    cd -
+        ctest || error=1
 
-    [ $error ] && return 1
+        cd -
 
-    cd $G_RELEASE_DIR || error=1
+        [ $error ] && return 1
 
-    ctest
+    fi
 
-    cd -
+    if [ $G_RELEASE ]; then
 
-    [ $error ] && return 1
+        cd $G_RELEASE_DIR
+
+        ctest || error=1
+
+        cd -
+
+        [ $error ] && return 1
+
+    fi
 
     return 0
 }
@@ -107,8 +125,13 @@ function test_case
 
 function install
 {
-    cpack --config CPackConfig-debug.cmake || return 1
-    cpack --config CPackConfig-release.cmake || return 1
+    if [ $G_DEBUG ]; then
+        cpack --config CPackConfig-debug.cmake || return 1
+    fi
+
+    if [ $G_RELEASE ]; then
+        cpack --config CPackConfig-release.cmake || return 1
+    fi
 
     return 0
 }
@@ -194,14 +217,24 @@ function run_on_docker
 
 function usage
 {
-    echo "Usage: $0 [-h] [-d] [-r] [-u <user_id] [-g <group_id] [configure|compile|test|install|clean]
+    echo "Usage: $0 [OPTIONS] [ACTION]
+OPTIONS:
   -h            : help
   -d            : build on docker
+  -b            : build debug version and default is on unless -b or -n was set
+  -n            : build release version and default is on unless -b or -n was set
 
-Valid options if '-d' is provided:
-  -u <user_id>  : set user id in container
-  -g <group_id> : set group id in container
-  -r            : rebuild image" >& 2
+  Valid options if '-d' is provided:
+    -u <user_id>  : set user id in container
+    -g <group_id> : set group id in container
+    -r            : rebuild image
+
+ACTION: [configure|compile|test|install|clean]
+  configure : configure the code
+  compile   : compile the code
+  test      : test the code
+  install   : pack library, header and config of cmake.
+  clean     : clean" >& 2
 }
 
 #################################### main
@@ -211,7 +244,7 @@ user_id=
 group_id=
 rebuild_image=
 
-while getopts :hdru:g: opt
+while getopts :hdbnru:g: opt
 do
     case $opt in
         h)
@@ -220,6 +253,12 @@ do
             ;;
         d)
             docker=1
+            ;;
+        b)
+            G_DEBUG=1
+            ;;
+        n)
+            G_RELEASE=1
             ;;
         r)
             rebuild_image=1
@@ -239,6 +278,11 @@ do
 done
 
 shift $(($OPTIND - 1))
+
+if [[ ! $G_DEBUG && ! $G_RELEASE ]]; then
+    G_DEBUG=1
+    G_RELEASE=1
+fi
 
 if [[ $# -eq 1 ]]; then
     case $1 in
