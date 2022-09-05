@@ -25,6 +25,10 @@ else ()
     set(HCORE_INSTALL_CMAKEDIR lib/cmake/hcore)
 endif ()
 
+if (NOT DEFINED CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release")
+endif ()
+
 aux_source_directory(src SOURCE)
 
 # compile
