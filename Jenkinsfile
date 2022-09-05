@@ -14,7 +14,7 @@ pipeline {
             steps {
                 git 'https://gitee.com/homqyy/hcore.git'
                 
-                sh 'bash -x ./build_on_docker.sh build `id -u` `id -g`'
+                sh 'bash -x ./build.sh -d -u `id -u` -g `id -g`'
             }
         }
         stage('Test') {

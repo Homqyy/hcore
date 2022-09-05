@@ -79,6 +79,28 @@ function compile
     cd -
 }
 
+function test_case
+{
+    error;
+
+    cd $G_DEBUG_DIR || error=1
+
+    ctest
+
+    cd -
+
+    [ $error ] && return 1
+
+    cd $G_RELEASE_DIR || error=1
+
+    ctest
+
+    cd -
+
+    [ $error ] && return 1
+}
+
+
 function install
 {
     cpack --config CPackConfig-debug.cmake || return 1
@@ -125,9 +147,7 @@ function run_on_docker
         fi
 
         # to run a new container
-        g_image_id=get_image_id $project_label
-
-        if ! $g_image_id; then
+        if ! get_image_id $project_label; then
             error_msg "fail to get image"
             return 1
         fi
@@ -156,7 +176,7 @@ function run_on_docker
 
 function usage
 {
-    echo "Usage: $0 [-d] [-h] [-u <user_id] [-g <group_id] [configure|compile|install|clean]
+    echo "Usage: $0 [-d] [-h] [-u <user_id] [-g <group_id] [configure|compile|test|install|clean]
   -h            : help
   -d            : build on docker
 
@@ -201,28 +221,35 @@ if [[ $# -eq 1 ]]; then
     case $1 in
         configure)
             if [[ $docker -eq 1 ]]; then
-                run_on_docker configure user_id group_id
+                run_on_docker configure $user_id $group_id
             else
                 configure
             fi
             ;;
         compile)
             if [[ $docker -eq 1 ]]; then
-                run_on_docker compile user_id group_id
+                run_on_docker compile $user_id $group_id
             else
                 compile
             fi
             ;;
+       test)
+            if [[ $docker -eq 1 ]]; then
+                run_on_docker test_case $user_id $group_id
+            else
+                test_case
+            fi
+            ;;
         install)
             if [[ $docker -eq 1 ]]; then
-                run_on_docker install user_id group_id
+                run_on_docker install $user_id $group_id
             else
                 install
             fi
             ;;
         clean)
             if [[ $docker -eq 1 ]]; then
-                run_on_docker clean user_id group_id
+                run_on_docker clean $user_id $group_id
             else
                 clean
             fi
@@ -238,8 +265,8 @@ elif [[ $# -gt 1 ]]; then
 else
     # all
     if [[ $docker -eq 1 ]]; then
-        run_on_docker user_id group_id
+        run_on_docker $user_id $group_id
     else
-        configure && compile && install
+        configure && compile && test_case && install
     fi
 fi
