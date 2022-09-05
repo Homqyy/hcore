@@ -118,11 +118,28 @@ function clean
 function get_image_id
 {
     project_label=$1
+    rebuild=$2
     g_image_id=`docker images -qf label=$project_label` || return 1
+
+    if [[ -n "$rebuild" && -n "$g_image_id" ]]; then
+        docker rmi $g_image_id
+	g_image_id=
+    fi
 
     if [ -z "$g_image_id" ]; then
         # to build a image
-        g_image_id=`docker build -qf ./Dockerfile .` || return 1
+
+        build_option=
+
+        if [ -n "$user_id" ]; then
+            build_option="--build-arg USER=$user_id $build_option"
+        fi
+
+        if [ -n "$group_id" ]; then
+            build_option="--build-arg GROUP=$group_id $build_option"
+        fi
+
+        g_image_id=`docker build -qf ./Dockerfile $build_option .` || return 1
     fi
 
     echo "image_id=$g_image_id"
@@ -135,8 +152,9 @@ function run_on_docker
     action=$1
     user_id=$2
     group_id=$3
+    rebuild=$4
 
-    project_label="label=cn.homqyy.docker.project=hcore"
+    project_label="cn.homqyy.docker.project=hcore"
 
     g_container_id=`docker ps -qf label=$project_label` || return 1
 
@@ -149,24 +167,14 @@ function run_on_docker
         fi
 
         # to run a new container
-        if ! get_image_id $project_label; then
+        if ! get_image_id "$project_label" "$rebuild"; then
             error_msg "fail to get image"
             return 1
         fi
 
-        build_option=
-
-        if [ $user_id ]; then
-            build_option="--build-arg USER=$user_id $build_option"
-        fi
-
-        if [ $group_id ]; then
-            build_option="--build-arg GROUP=$group_id $build_option"
-        fi
-
         docker run -it --rm \
                 -v "${G_PROJECT_DIR}:/workspace/hcore" \
-                $build_option $g_image_id $action \
+                $g_image_id $action \
             || return 1
     else
         error_msg "container is running in id $g_container_id";
@@ -178,13 +186,14 @@ function run_on_docker
 
 function usage
 {
-    echo "Usage: $0 [-d] [-h] [-u <user_id] [-g <group_id] [configure|compile|test|install|clean]
+    echo "Usage: $0 [-h] [-d] [-r] [-u <user_id] [-g <group_id] [configure|compile|test|install|clean]
   -h            : help
   -d            : build on docker
 
 Valid options if '-d' is provided:
   -u <user_id>  : set user id in container
-  -g <group_id> : set group id in container" >& 2
+  -g <group_id> : set group id in container
+  -r            : rebuild image" >& 2
 }
 
 #################################### main
@@ -192,8 +201,9 @@ Valid options if '-d' is provided:
 docker=
 user_id=
 group_id=
+rebuild_image=
 
-while getopts :hdu:g: opt
+while getopts :hdru:g: opt
 do
     case $opt in
         h)
@@ -202,6 +212,9 @@ do
             ;;
         d)
             docker=1
+            ;;
+        r)
+            rebuild_image=1
             ;;
         u)
             user_id=$OPTARG
@@ -223,35 +236,35 @@ if [[ $# -eq 1 ]]; then
     case $1 in
         configure)
             if [[ $docker -eq 1 ]]; then
-                run_on_docker configure $user_id $group_id
+                run_on_docker configure "$user_id" "$group_id" "$rebuild_image"
             else
                 configure
             fi
             ;;
         compile)
             if [[ $docker -eq 1 ]]; then
-                run_on_docker compile $user_id $group_id
+                run_on_docker compile "$user_id" "$group_id" "$rebuild_image"
             else
                 compile
             fi
             ;;
        test)
             if [[ $docker -eq 1 ]]; then
-                run_on_docker test_case $user_id $group_id
+                run_on_docker test_case "$user_id" "$group_id" "$rebuild_image"
             else
                 test_case
             fi
             ;;
         install)
             if [[ $docker -eq 1 ]]; then
-                run_on_docker install $user_id $group_id
+                run_on_docker install "$user_id" "$group_id" "$rebuild_image"
             else
                 install
             fi
             ;;
         clean)
             if [[ $docker -eq 1 ]]; then
-                run_on_docker clean $user_id $group_id
+                run_on_docker clean $user_id $group_id $rebuild_image
             else
                 clean
             fi
@@ -267,7 +280,7 @@ elif [[ $# -gt 1 ]]; then
 else
     # all
     if [[ $docker -eq 1 ]]; then
-        run_on_docker $user_id $group_id
+        run_on_docker "" "$user_id" "$group_id" "$rebuild_image"
     else
         configure && compile && test_case && install
     fi
