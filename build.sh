@@ -1,34 +1,40 @@
-#!/bin/sh
+#!/bin/bash
 
-set -e
+#################################### global variable
 
-############################## Global Variable
+G_PROJECT_DIR=`cd $( dirname $0 ); pwd`
+G_TOOLS_DIR=$G_PROJECT_DIR/tools-dev
+G_CONFIG_FILE=$G_PROJECT_DIR/.config
+G_RELEASE_DIR=$G_PROJECT_DIR/release
+G_DEBUG_DIR=$G_PROJECT_DIR/debug
+G_PACKAGES_DIR=$G_PROJECT_DIR/packages
 
-PROJECT_DIR=`cd $( dirname $0 ); pwd`
-TOOLS_DIR=$PROJECT_DIR/tools-dev
-CONFIG_FILE=$PROJECT_DIR/.config
-RELEASE_DIR=$PROJECT_DIR/release
-DEBUG_DIR=$PROJECT_DIR/debug
-PACKAGES_DIR=$PROJECT_DIR/packages
-ACTION=$1
+#################################### function
 
-############################## Function
+. $G_TOOLS_DIR/base_for_bash.func
 
-BUILD_NUMBER_FILE=$PROJECT_DIR/.build_number
-
-function init
+function configure
 {
-    if [ "$ACTION" == "clean" ]; then
-        [ -e $PACKAGES_DIR ] && rm -rf $PACKAGES_DIR
-        [ -e $RELEASE_DIR ] && rm -rf $RELEASE_DIR
-        [ -e $DEBUG_DIR ] && rm -rf $DEBUG_DIR
-        [ -e $PROJECT_DIR/CMakeLists.txt ] && rm -f $PROJECT_DIR/CMakeLists.txt
-        
-        mkdir $RELEASE_DIR $DEBUG_DIR
-    fi
+    BUILD_NUMBER_FILE=$G_PROJECT_DIR/.build_number
+
+    clean
+    
+    mkdir $G_RELEASE_DIR $G_DEBUG_DIR || return 1
+
+    [ -e $BUILD_NUMBER_FILE ] || echo "1" > $BUILD_NUMBER_FILE
+
+    $G_TOOLS_DIR/gen_cmakelists.pl \
+        $G_PROJECT_DIR/CMakeLists.txt.in \
+        $G_PROJECT_DIR/CMakeLists.txt \
+        $G_PROJECT_DIR
+}
+
+function compile
+{
+    BUILD_NUMBER_FILE=$G_PROJECT_DIR/.build_number
 
     # increase build number
-    [ -e $BUILD_NUMBER_FILE ] || echo "1" > $BUILD_NUMBER_FILE
+
     build_n=`cat $BUILD_NUMBER_FILE`
 
     build_n=$(($build_n+1))
@@ -36,45 +42,204 @@ function init
     echo $build_n > $BUILD_NUMBER_FILE
 
     # each 10 build to increase minor version at next build
+
     build_n=$(($build_n%10))
     if [ $build_n -eq 0 ]; then
-        OPTIONS="--next_minor"
+        $G_TOOLS_DIR/gen_cmakelists.pl \
+            --next_minor \
+            -- \
+            $G_PROJECT_DIR/CMakeLists.txt.in \
+            $G_PROJECT_DIR/CMakeLists.txt \
+            $G_PROJECT_DIR \
+        || return 1
     fi
 
-    $TOOLS_DIR/gen_cmakelists.pl \
-        $OPTIONS \
-        -- \
-        $PROJECT_DIR/CMakeLists.txt.in \
-        $PROJECT_DIR/CMakeLists.txt \
-        $PROJECT_DIR
-}
-
-function build
-{
     # build debug
-    cd $DEBUG_DIR
-    cmake -DCMAKE_BUILD_TYPE=Debug ..
-    cmake --build .
-    ctest
+
+    cd $G_DEBUG_DIR
+
+    cmake -DCMAKE_BUILD_TYPE=Debug .. \
+        && cmake --build . \
+        || error=1
+
     cd -
+
+    [ $error ] && return 1
 
     # build release
-    cd $RELEASE_DIR
-    cmake -DCMAKE_BUILD_TYPE=Release ..
-    cmake --build .
-    ctest
+
+    cd $G_RELEASE_DIR
+
+    cmake -DCMAKE_BUILD_TYPE=Release .. \
+        && cmake --build . \
+        || error=1
+
+    [ $error ] && return 1
+
     cd -
 }
 
-function build_done
+function install
 {
-    cpack --config CPackConfig-debug.cmake
-    cpack --config CPackConfig-release.cmake
+    cpack --config CPackConfig-debug.cmake || return 1
+    cpack --config CPackConfig-release.cmake || return 1
 }
 
-############################## Main
+function clean
+{
+    [ -e $G_PACKAGES_DIR ] && rm -rf $G_PACKAGES_DIR
+    [ -e $G_RELEASE_DIR ] && rm -rf $G_RELEASE_DIR
+    [ -e $G_DEBUG_DIR ] && rm -rf $G_DEBUG_DIR
+    [ -e $G_PROJECT_DIR/CMakeLists.txt ] && rm -f $G_PROJECT_DIR/CMakeLists.txt
+}
 
-cd $PROJECT_DIR
-init
-build
-build_done
+function get_image_id
+{
+    project_label=$1
+    g_image_id=`docker images -qf label=$project_label` || return 1
+
+    if [ -z "$g_image_id" ]; then
+        # to build a image
+        g_image_id=`docker build -qf ./Dockerfile .` || return 1
+    fi
+
+    return 0
+}
+
+function run_on_docker
+{
+    action=$1
+    user_id=$2
+    group_id=$3
+
+    project_label="label=cn.homqyy.docker.project=hcore"
+
+    g_container_id=`docker ps -qf label=$project_label` || return 1
+
+    if [ -z "$g_container_id" ]; then
+        g_container_id=`docker ps -qaf label=$project_label` || return 1
+
+        if [ -n "$g_container_id" ]; then
+            # container was stoped, remove it ( don't arrived )
+            docker rm $g_container_id
+        fi
+
+        # to run a new container
+        g_image_id=get_image_id $project_label
+
+        if ! $g_image_id; then
+            error_msg "fail to get image"
+            return 1
+        fi
+
+        build_option=
+
+        if [ $user_id ]; then
+            build_option="--build-arg USER=$user_id $build_option"
+        fi
+
+        if [ $group_id ]; then
+            build_option="--build-arg GROUP=$group_id $build_option"
+        fi
+
+        docker run -it --rm \
+                -v "${G_PROJECT_DIR}:/workspace/hcore" \
+                $build_option $g_image_id $action \
+            || return 1
+    else
+        error_msg "container is running in id $g_container_id";
+        return 1
+    fi
+
+    return 0;
+}
+
+function usage
+{
+    echo "Usage: $0 [-d] [-h] [-u <user_id] [-g <group_id] [configure|compile|install|clean]
+  -h            : help
+  -d            : build on docker
+
+Valid options if '-d' is provided:
+  -u <user_id>  : set user id in container
+  -g <group_id> : set group id in container" >& 2
+}
+
+#################################### main
+
+docker=
+user_id=
+group_id=
+
+while getopts :hdu:g: opt
+do
+    case $opt in
+        h)
+            usage
+            exit 0;
+            ;;
+        d)
+            docker=1
+            ;;
+        u)
+            user_id=$OPTARG
+            ;;
+        g)
+            group_id=$OPTARG
+            ;;
+        '?')
+            error_msg "$0: invalid option -$OPTARG"
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+shift $(($OPTIND - 1))
+
+if [[ $# -eq 1 ]]; then
+    case $1 in
+        configure)
+            if [[ $docker -eq 1 ]]; then
+                run_on_docker configure user_id group_id
+            else
+                configure
+            fi
+            ;;
+        compile)
+            if [[ $docker -eq 1 ]]; then
+                run_on_docker compile user_id group_id
+            else
+                compile
+            fi
+            ;;
+        install)
+            if [[ $docker -eq 1 ]]; then
+                run_on_docker install user_id group_id
+            else
+                install
+            fi
+            ;;
+        clean)
+            if [[ $docker -eq 1 ]]; then
+                run_on_docker clean user_id group_id
+            else
+                clean
+            fi
+            ;;
+        *)
+            usage
+            exit 1
+    esac
+elif [[ $# -gt 1 ]]; then
+    error_msg "arguments too much"
+    usage
+    exit 1
+else
+    # all
+    if [[ $docker -eq 1 ]]; then
+        run_on_docker user_id group_id
+    else
+        configure && compile && install
+    fi
+fi

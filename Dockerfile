@@ -17,6 +17,8 @@ RUN groupadd -g $GROUP hcore \
 
 USER $USER:$GROUP
 
+WORKDIR /workspace/hcore
+
 LABEL cn.homqyy.docker.author="homqyy"
 LABEL cn.homqyy.docker.email="yilupiaoxuewhq@163.com"
-LABEL cn.homqyy.docker.title="hcore"
+LABEL cn.homqyy.docker.project="hcore"
