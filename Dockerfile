@@ -22,3 +22,5 @@ WORKDIR /workspace/hcore
 LABEL cn.homqyy.docker.author="homqyy"
 LABEL cn.homqyy.docker.email="yilupiaoxuewhq@163.com"
 LABEL cn.homqyy.docker.project="hcore"
+
+ENTRYPOINT [ "/bin/bash" "./build.sh" ]
