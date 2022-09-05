@@ -125,6 +125,8 @@ function get_image_id
         g_image_id=`docker build -qf ./Dockerfile .` || return 1
     fi
 
+    echo "image_id=$g_image_id"
+
     return 0
 }
 
