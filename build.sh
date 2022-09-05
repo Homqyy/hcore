@@ -74,9 +74,11 @@ function compile
         && cmake --build . \
         || error=1
 
+    cd -
+
     [ $error ] && return 1
 
-    cd -
+    return 0;
 }
 
 function test_case
@@ -98,6 +100,8 @@ function test_case
     cd -
 
     [ $error ] && return 1
+
+    return 0
 }
 
 
@@ -105,6 +109,8 @@ function install
 {
     cpack --config CPackConfig-debug.cmake || return 1
     cpack --config CPackConfig-release.cmake || return 1
+
+    return 0
 }
 
 function clean
@@ -113,6 +119,8 @@ function clean
     [ -e $G_RELEASE_DIR ] && rm -rf $G_RELEASE_DIR
     [ -e $G_DEBUG_DIR ] && rm -rf $G_DEBUG_DIR
     [ -e $G_PROJECT_DIR/CMakeLists.txt ] && rm -f $G_PROJECT_DIR/CMakeLists.txt
+
+    return 0
 }
 
 function get_image_id
