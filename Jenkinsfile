@@ -38,7 +38,8 @@ pipeline {
     post {
         failure {
             mail to: 'yilupiaoxuewhq@163.com',
-            subject: 'The Pipeline failed for hcore project :('
+            subject: 'The Pipeline failed :('
+            body: "fail to build 'hcore'"
         }
     }
 }
