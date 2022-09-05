@@ -10,11 +10,18 @@
 
 ## 开发
 
+- 获取源代码后，通过以下两个命令获取子模块代码：
+
+    ```bash
+    git submodule init
+    git submodule update
+    ```
+
 - 开发环境
     - 在拥有容器环境的主机上：
         - 方法一（推荐）：支持通过`VSCode`的`Remote - Containers`插件进行容器式开发以这种方式可以免除搭建开发环境的困恼
             - 通过`Remote - Containers`插件运行开发环境后，执行`./build.sh`进行构建即可。
-        - 方法二：执行命令`./build_on_docker.sh build`进行构建
+        - 方法二：执行命令`./build.sh -d`进行构建，该方法会构建镜像并运行容器，在容器中进行编译等操作
     - 在非容器环境的主机上：
         1. 安装依赖
             - cmake：v3.0.0以上
