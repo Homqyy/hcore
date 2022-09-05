@@ -250,7 +250,7 @@ if [[ $# -eq 1 ]]; then
             ;;
        test)
             if [[ $docker -eq 1 ]]; then
-                run_on_docker test_case "$user_id" "$group_id" "$rebuild_image"
+                run_on_docker 'test' "$user_id" "$group_id" "$rebuild_image"
             else
                 test_case
             fi
