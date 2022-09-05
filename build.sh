@@ -316,7 +316,7 @@ if [[ $# -eq 1 ]]; then
             ;;
         clean)
             if [[ $docker -eq 1 ]]; then
-                run_on_docker clean $user_id $group_id $rebuild_image
+                run_on_docker clean "$user_id" "$group_id" "$rebuild_image"
             else
                 clean
             fi
