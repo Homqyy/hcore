@@ -3,7 +3,6 @@ pipeline {
     
     stages {
         stage('init') {
-            echo 'init..'
             steps {
                 git 'https://gitee.com/homqyy/hcore.git'
                 
@@ -12,7 +11,6 @@ pipeline {
             }
         }
         stage('Build') {
-            echo 'Building..'
             steps {
                 git 'https://gitee.com/homqyy/hcore.git'
                 
