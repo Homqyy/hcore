@@ -126,7 +126,7 @@ TEST(astringTest, DestroyNull)
 
 TEST(astringTest, DestroyUninit)
 {
-    hcore_astring_t astr;
+    hcore_astring_t astr = {0};
 
     EXPECT_DEBUG_DEATH(hcore_destroy_astring(&astr), "hcore_destroy_astring: Assertion `astr && astr->inited' failed") ;
 }
