@@ -91,7 +91,7 @@ TestSlabPoolAfterAllocSmall(hcore_shpool_t *shpool, size_t alloced_size,
 {
     hcore_slab_pool_t *sp = shpool->sp;
     hcore_slab_page_t *slots, *page;
-    hcore_int_t        pagesize, size, exact_shift, exact_size, shift;
+    hcore_int_t        pagesize, shift;
     hcore_uint_t       slot, page_n;
 
     pagesize = hcore_getpagesize();

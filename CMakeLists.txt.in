@@ -4,8 +4,10 @@ project(hcore VERSION @@{VERSION}@@ LANGUAGES C CXX)
 # init
 
 set(CMAKE_DEBUG_POSTFIX -debug)
+
 ## GoogleTest requires at least C++14
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 if (DEFINED ENV{HCORE_INSTALL_LIBDIR})
     set(HCORE_INSTALL_LIBDIR $ENV{HCORE_INSTALL_LIBDIR})
@@ -47,6 +49,8 @@ target_link_libraries(hcore INTERFACE rt)
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     target_compile_definitions(hcore PUBLIC _HCORE_DEBUG)
     target_compile_options(hcore PRIVATE -g -O0)
+else()
+    target_compile_options(hcore PRIVATE -O2)
 endif()
 
 # Test
