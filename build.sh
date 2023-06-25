@@ -99,7 +99,7 @@ function test_case
 
         cd $G_DEBUG_DIR
 
-        ctest || error=1
+        ctest --output-on-failure || error=1
 
         cd -
 
@@ -111,7 +111,7 @@ function test_case
 
         cd $G_RELEASE_DIR
 
-        ctest || error=1
+        ctest --output-on-failure || error=1
 
         cd -
 
