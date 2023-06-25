@@ -31,7 +31,8 @@ hcore_shmtx_init(hcore_shmtx_t *mtx, hcore_shmtx_sh_t *addr)
         return HCORE_OK;
     }
 
-    mtx->spin = 2048;
+    /* Use default spin value if not set */
+    mtx->spin = 1 << 11;
 
     return HCORE_OK;
 }
@@ -44,11 +45,14 @@ hcore_shmtx_lock(hcore_shmtx_t *mtx)
 
     for (;;)
     {
+        // If the lock is not held by anyone, then try to acquire it.
         if (*mtx->lock == 0 && hcore_atomic_cmp_set(mtx->lock, 0, pid))
         {
             return;
         }
 
+        // If we have not yet spun for the maximum amount of time, then spin
+        // for the current amount of time.
         for (n = 1; n < mtx->spin; n <<= 1)
         {
             for (i = 0; i < n; i++)
@@ -56,12 +60,15 @@ hcore_shmtx_lock(hcore_shmtx_t *mtx)
                 hcore_cpu_pause();
             }
 
+            // If the lock is not held by anyone, then try to acquire it.
             if (*mtx->lock == 0 && hcore_atomic_cmp_set(mtx->lock, 0, pid))
             {
                 return;
             }
         }
 
+        // If we have spun for the maximum amount of time, then yield the
+        // remainder of our timeslice.
         hcore_sched_yield();
     }
 }

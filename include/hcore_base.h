@@ -2,7 +2,7 @@
  * @file hcore_base.h
  * @author homqyy (yilupiaoxuewhq@163.com)
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @brief 基础的宏定义接口
+ * @brief base function
  * @version 0.1
  * @date 2021-09-26
  *
@@ -24,38 +24,46 @@
 #include <stddef.h>
 
 /**
- * @brief  获取 'valud' 的绝对值
+ * @brief  get absolute value of 'value'
  * @note
- * @retval
+ * @param  value: value
+ * @retval absolute value of 'value'
  */
 #define hcore_abs(value) (((value) >= 0) ? (value) : -(value))
 
 /**
- * @brief  获取 'val1' 和 'val2' 两者间的最大值
+ * @brief  get max value of 'val1' and 'val2'
  * @note
- * @retval
+ * @param  val1: value 1
+ * @param  val2: value 2
+ * @retval max value of 'val1' and 'val2'
  */
 #define hcore_max(val1, val2) ((val1 < val2) ? (val2) : (val1))
 
 /**
- * @brief  获取 'val1' 和 'val2' 两者间的最小值
+ * @brief  get min value of 'val1' and 'val2'
  * @note
- * @retval
+ * @param  val1: value 1
+ * @param  val2: value 2
+ * @retval min value of 'val1' and 'val2'
  */
 #define hcore_min(val1, val2) ((val1 > val2) ? (val2) : (val1))
 
 /**
- * @brief  排列指针地址：按照 'a' 字节来排列指针 'p'
+ * @brief  align 'p' to 'a' bytes boundary
  * @note
- * @retval
+ * @param  p: address
+ * @param  a: alignment
+ * @retval aligned address
  */
 #define hcore_align_ptr(p, a)                               \
     (hcore_uchar_t *)(((uintptr_t)(p) + ((uintptr_t)a - 1)) \
                       & ~((uintptr_t)a - 1))
 
 /**
- * @brief  获取常量数组的元素个数
+ * @brief  get number of elements in array 'const_array'
  * @note
+ * @param  const_array: array
  * @retval
  */
 #define HCORE_ARRAY_NUM(const_array) \
@@ -67,10 +75,19 @@
  * * 'link' 是 'field' 在 'type' 中的字段名。
  *
  * @note
- * @retval
+ * @retval type * : 返回数据结构 'type' 的首地址
  */
 #define HCORE_GET_DATA_BY_FIELD(field, type, link) \
     (type *)((hcore_uchar_t *)field - offsetof(type, link))
+
+
+/**
+ * @brief Get pid of current process
+ * @return hcore_pid_t : pid of process
+ */
+#define hcore_getpid() ((hcore_pid_t)getpid())
+
+#define hcore_likely(x) __builtin_expect(!!(x), 1)
 
 /**
  * @brief get system page size
@@ -85,13 +102,6 @@ hcore_int_t hcore_getpagesize(void);
  * @return hcore_int_t : shift of pagesize
  */
 hcore_int_t hcore_getpagesize_shift(void);
-
-/**
- * @brief get pid of current process
- *
- * @return hcore_pid_t : pid of process
- */
-hcore_pid_t hcore_getpid(void);
 
 /**
  * @brief Do invoke once in process. it will initialize all be required by

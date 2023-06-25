@@ -56,7 +56,7 @@ typedef struct
     hcore_shmtx_t      mutex;
     const char        *name; // name of shpool, it's must string of constant
 
-    hcore_uint_t create : 1;
+    hcore_uint_t create : 1; // 1: create, 0: get
 } hcore_shpool_t;
 
 /**
@@ -67,6 +67,7 @@ typedef struct
  * can be 'NULL' that meant what the pool is anonymous, so you can't again get
  * it by any way.
  * @param size expecting size of pool
+ * 
  * @return hcore_shpool_t* : Upon successful is return a pool object, otherwise
  * return NULL
  */
@@ -77,20 +78,88 @@ hcore_shpool_t *hcore_get_shpool(hcore_log_t *log, const char *name);
  * @brief destroy a pool object
  *
  * @param shpool pool object
+ * 
+ * @retval void
  */
 void            hcore_destroy_shpool(hcore_shpool_t *shpool);
 
+/**
+ * @brief allocate a space from pool, and lock the pool
+ *
+ * @param shpool shared memory pool
+ * @param size size of space
+ * 
+ * @return void* : Upon successful is return a pointer to space, otherwise
+ * return NULL
+ */
 void *hcore_shpool_alloc(hcore_shpool_t *shpool, size_t size);
+/**
+ * @brief allocate a space from pool, but not lock the pool (it's must be
+ * locked)
+ *
+ * @param shpool shared memory pool
+ * @param size size of space
+ * @return void* : Upon successful is return a pointer to space, otherwise
+ */
 void *hcore_shpool_alloc_locked(hcore_shpool_t *shpool, size_t size);
+/**
+ * @brief allocate a space from pool, and lock the pool, and set the space to 0
+ *
+ * @param shpool shared memory pool
+ * @param size size of space
+ * @return void* : Upon successful is return a pointer to space, otherwise
+ */
 void *hcore_shpool_calloc(hcore_shpool_t *shpool, size_t size);
+/**
+ * @brief free a space to pool, and lock the pool
+ *
+ * @param shpool shared memory pool
+ * @param p space pointer
+ */
 void  hcore_shpool_free(hcore_shpool_t *shpool, void *p);
+/**
+ * @brief free a space to pool, but not lock the pool (it's must be locked)
+ *
+ * @param shpool shared memory pool
+ * @param p space pointer
+ *
+ * @retval void
+ */
 void  hcore_shpool_free_locked(hcore_shpool_t *shpool, void *p);
 
+/**
+ * @brief lock a pool
+ *
+ * @param shpool shared memory pool
+ *
+ * @retval void
+ */
 #define hcore_shpool_lock(shpool)    hcore_shmtx_lock(&(shpool)->mutex)
+/**
+ * @brief unlock a pool
+ *
+ * @param shpool shared memory pool
+ *
+ * @retval void
+ */
 #define hcore_shpool_unlock(shpool)  hcore_shmtx_unlock(&(shpool)->mutex)
+/**
+ * @brief try to lock a pool
+ *
+ * @param shpool shared memory pool
+ *
+ * @retval hcore_uint_t 1 on success, 0 on failure
+ */
 #define hcore_shpool_trylock(shpool) hcore_shmtx_trylock(&(shpool)->mutex)
 
 #ifdef _HCORE_DEBUG
+/**
+ * @brief dump a pool
+ *
+ * @param shpool shared memory pool
+ * 
+ * @retval void
+ */
 void hcore_shpool_dump(hcore_shpool_t *shpool);
 #else
 #define hcore_shpool_dump(shpool)

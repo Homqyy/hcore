@@ -97,9 +97,3 @@ hcore_getpagesize_shift(void)
 
     return g_hcore_pagesize_shift;
 }
-
-hcore_pid_t
-hcore_getpid(void)
-{
-    return getpid();
-}

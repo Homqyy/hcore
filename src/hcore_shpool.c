@@ -81,19 +81,18 @@ static void *hcore_slab_alloc_locked(hcore_slab_pool_t *pool, size_t size);
 hcore_shpool_t *
 hcore_create_shpool(hcore_log_t *log, const char *name, size_t size)
 {
-    hcore_shpool_t *shpool = NULL;
-    int             flags  = MAP_SHARED;
-    int             fd     = -1;
-
     hcore_assert(log && size);
 
-    if (log == NULL || size == 0) return NULL;
-
-    shpool = hcore_malloc(sizeof(hcore_shpool_t));
+    // Allocate a new slab pool and initialize it.
+    hcore_shpool_t *shpool = hcore_malloc(sizeof(hcore_shpool_t));
     if (shpool == NULL) return NULL;
 
     hcore_memzero(shpool, sizeof(hcore_shpool_t));
 
+    // If the caller specified a name, then create a shared memory block with
+    // that name. Otherwise, create an anonymous shared memory block.
+    int fd    = -1;
+    int flags = MAP_SHARED;
     if (name == NULL)
     {
         fd = -1;
@@ -111,14 +110,13 @@ hcore_create_shpool(hcore_log_t *log, const char *name, size_t size)
         }
     }
 
-    // count size
+    // Count size.
     hcore_int_t pagesize = hcore_getpagesize();
-
-    size = hcore_max(size, HCORE_SLAB_MIN_SIZE(pagesize));
+    size                 = hcore_max(size, HCORE_SLAB_MIN_SIZE(pagesize));
 
     if (fd != -1) ftruncate(fd, size);
 
-    // create pool of shared memory
+    // Create pool of shared memory.
     shpool->addr = mmap(NULL, size, PROT_READ | PROT_WRITE, flags, fd, 0);
     if (shpool->addr == MAP_FAILED)
     {
@@ -128,6 +126,7 @@ hcore_create_shpool(hcore_log_t *log, const char *name, size_t size)
         goto error;
     }
 
+    // Initialize the slab pool.
     shpool->log    = log;
     shpool->name   = name;
     shpool->size   = size;
@@ -1016,7 +1015,7 @@ hcore_destroy_shpool(hcore_shpool_t *shpool)
                         "munmap(%p, %uz) failed", shpool->addr, shpool->size);
     }
 
-    if (shpool->name && shpool->create == 0)
+    if (shpool->name && shpool->create)
     {
         if (shm_unlink(shpool->name) == -1)
         {
