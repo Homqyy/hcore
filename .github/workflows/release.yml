@@ -1,0 +1,29 @@
+name: CMake
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Build image
+      with:
+        context: .
+        dockerfile: Dockerfile
+
+    - name: Configure CMake
+      run: ./build.sh -n configure
+
+    - name: Compile
+      run: ./build.sh -n compile
+
+    - name: Test
+      run: ./build.sh -n test
+
