@@ -11,11 +11,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Build image
+    - name: Checkout repository and submodules
       uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Runing on container
+      uses: docker/build-push-action@v2
       with:
         context: .
         dockerfile: Dockerfile
+
+    - name: Update submodules
+      run: git submodule update --init --recursive
 
     - name: Configure CMake
       run: ./build.sh -n configure
