@@ -1,0 +1,35 @@
+name: hcore-debug
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Runing on container
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: Dockerfile
+
+    - name: Update submodules
+      run: git submodule update --init --recursive
+
+    - name: Configure CMake
+      run: ./build.sh -b configure
+
+    - name: Compile
+      run: ./build.sh -b compile
+
+    - name: Test
+      run: ./build.sh -b test
