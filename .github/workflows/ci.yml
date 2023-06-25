@@ -41,17 +41,3 @@ jobs:
         git add .build_number .gcmake/.version
         git commit -m "Update .build_number and .version [skip ci]"
         git push origin HEAD:master
-
-    - name: Send mailer
-      if: failure()
-      uses: dawidd6/action-send-mail@v3
-      with:
-        server_address: ${{ secrets.MAIL_SERVER }}
-        server_port: 465
-        username: ${{ secrets.MAIL_USERNAME }}
-        password: ${{ secrets.MAIL_PASSWORD }}
-        subject: 【Github Action】hcore-ci result
-        to: ${{ secrets.MAIL_RECIPIENT }}, ${{ secrets.MAIL_RECIPIENT }}
-        from: ${{ secrets.MAIL_USERNAME }}
-        body: Job ${{ github.job }} in workflow ${{ github.workflow }} of ${{ github.repository }} completed with status ${{ job.status }}. See details at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
