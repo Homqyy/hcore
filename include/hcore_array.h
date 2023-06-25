@@ -1,7 +1,6 @@
 /**
  * @file hcore_array.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief 动态数组结构
  * @version 0.1
  * @date 2021-09-26
@@ -94,7 +93,10 @@ hcore_array_init(hcore_array_t *array, hcore_pool_t *pool, hcore_uint_t n,
     array->pool   = pool;
 
     array->elts = hcore_palloc(pool, n * size);
-    if (array->elts == NULL) { return HCORE_ERROR; }
+    if (array->elts == NULL)
+    {
+        return HCORE_ERROR;
+    }
 
     return HCORE_OK;
 }

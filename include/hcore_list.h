@@ -1,7 +1,6 @@
 /**
  * @file hcore_list.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief 提供一个链表结构，且该结构提供了排序功能
  * @version 0.1
  * @date 2021-09-26

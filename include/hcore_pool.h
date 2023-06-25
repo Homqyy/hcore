@@ -1,7 +1,6 @@
 /**
  * @file hcore_pool.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief 提供内存池，通过内存池可以方便的管理内存
  * @version 0.1
  * @date 2021-09-26

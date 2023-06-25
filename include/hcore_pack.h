@@ -1,7 +1,6 @@
 /**
  * @file hcore_pack.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief 提供一个报文结构，利用此结构可以方便的进行IPC。
  * * 其优势在于可以用一个易于开发的方式来传递进程间的数据，
  * * 可以通过接口在'buf'和'PACK'结构间自由转化

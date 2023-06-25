@@ -1,7 +1,6 @@
 /**
  * @file hcore_debug.c
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief
  * @version 0.1
  * @date 2021-10-18

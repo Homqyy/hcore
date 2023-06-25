@@ -1,7 +1,6 @@
 /**
  * @file hcore_rbtree.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief 提供红黑树接口
  * @version 0.1
  * @date 2021-09-26

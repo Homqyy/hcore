@@ -1,7 +1,6 @@
 /**
  * @file hcore_lib.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief
  * * <stdlib.h>的包裹函数，和一些基础接口。任何用到堆的接口应当统一用此包裹函数取代，在打开调试版本后，可以进行堆的追踪
  * @version 0.1

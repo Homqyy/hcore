@@ -1,7 +1,6 @@
 /**
  * @file hcore_inet.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief 提供处理网络结构和报文的接口
  * @version 0.1
  * @date 2021-09-26

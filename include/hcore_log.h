@@ -1,7 +1,6 @@
 /**
  * @file hcore_log.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief
  * 提供日志接口，可以方便的进行日志记录，并且有非常规范的日志格式和级别控制
  * @version 0.1

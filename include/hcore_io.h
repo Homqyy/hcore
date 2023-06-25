@@ -1,7 +1,6 @@
 /**
  * @file hcore_io.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief sdtio.h 的包裹函数
  * @version 0.1
  * @date 2021-09-26

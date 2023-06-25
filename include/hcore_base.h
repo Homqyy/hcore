@@ -1,7 +1,6 @@
 /**
  * @file hcore_base.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief base function
  * @version 0.1
  * @date 2021-09-26

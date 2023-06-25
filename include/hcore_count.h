@@ -1,7 +1,6 @@
 /**
  * @file hcore_count.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief 提供运算相关的接口
  * @version 0.1
  * @date 2021-09-26

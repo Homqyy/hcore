@@ -1,7 +1,6 @@
 /**
  * @file hcore_types.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief
  * typedef定义，当hcore_core接口出现循环依赖时，需要将typedef的定义放置到此
  * @version 0.1

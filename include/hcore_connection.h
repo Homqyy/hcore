@@ -1,7 +1,6 @@
 /**
  * @file hcore_connection.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @author homqyy (yilupiaoxuewhq@163.com)
  * @brief 提供连接结构，通过连接接口可以方便的进行事件的处理
  * @version 0.1
  * @date 2021-09-26
