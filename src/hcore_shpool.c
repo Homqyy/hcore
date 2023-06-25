@@ -83,6 +83,11 @@ hcore_create_shpool(hcore_log_t *log, const char *name, size_t size)
 {
     hcore_assert(log && size);
 
+    if (log == NULL || size == 0)
+    {
+        return NULL;
+    }
+
     // Allocate a new slab pool and initialize it.
     hcore_shpool_t *shpool = hcore_malloc(sizeof(hcore_shpool_t));
     if (shpool == NULL) return NULL;
