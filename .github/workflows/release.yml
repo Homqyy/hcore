@@ -1,4 +1,4 @@
-name: CMake
+name: hcore-release
 
 on:
   push:
@@ -11,9 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-
     - name: Build image
+      uses: actions/checkout@v3
       with:
         context: .
         dockerfile: Dockerfile
