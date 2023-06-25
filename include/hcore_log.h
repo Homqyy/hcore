@@ -1,8 +1,8 @@
 /**
  * @file hcore_log.h
  * @author homqyy (yilupiaoxuewhq@163.com)
- * @brief
- * 提供日志接口，可以方便的进行日志记录，并且有非常规范的日志格式和级别控制
+ * @brief Provide log interface, which can easily record logs,
+ * and have very standardized log format and level control
  * @version 0.1
  * @date 2021-09-26
  *
@@ -49,22 +49,24 @@ typedef hcore_uchar_t *(*hcore_log_handler_pt)(hcore_log_t   *log,
 
 struct hcore_log_s
 {
-    hcore_uint_t log_level; // 日志级别
-    int          fd;        // 日志文件的描述符
-    char        *filename;  // 日志文件名
-    char        *object; // 目标名称，用于记录日志（日志格式中有一个字段就是'目标'）
+    hcore_uint_t log_level; // log level
+    int          fd;        // fd of log file
+    char        *filename;  // log file name
+    char *object; // name of the object, used for logging (there is a field in
+                  // the log format that is 'target')
 
     /*
      * we declare "action" as "char *" because the actions are usually
      * the static strings and in the "u_char *" case we have to override
-     * their types all the time
-     */
+     * their types all the time */
     hcore_log_handler_pt handler;
     void                *data;
     char                *action;
 
-    hcore_log_get_time_pt
-        get_time; // 获取时间的回调函数，如果为空则默认调用'hcore_log_get_localtime()'
+    /*
+     * callback function to get time,
+     * if it is NULL, then call 'hcore_log_get_localtime()' by default */
+    hcore_log_get_time_pt get_time;
 
     hcore_uint_t internal : 1; // is internal log
 };
@@ -73,12 +75,31 @@ struct hcore_log_s
 void hcore_log_error_core(int level, hcore_log_t *log, hcore_err_t err,
                           const char *fmt, ...);
 
+/**
+ * @brief record log
+ *
+ * @param level: log level
+ * @param log: log object
+ * @param err: error code
+ * @param ...: format string and parameters if needed
+ *
+ * @return void
+ */
 #define hcore_log_error(level, log, err, ...) \
     if ((log)->log_level >= level)            \
     hcore_log_error_core(level, log, err, __VA_ARGS__)
 
 #ifdef _HCORE_DEBUG
 
+/**
+ * @brief record debug log
+ *
+ * @param log: log object
+ * @param err: error code
+ * @param ...: format string and parameters if needed
+ *
+ * @return void
+ */
 #define hcore_log_debug(log, err, ...) \
     hcore_log_error(HCORE_LOG_DEBUG, log, err, __VA_ARGS__)
 
@@ -94,21 +115,28 @@ void hcore_log_error_core(int level, hcore_log_t *log, hcore_err_t err,
 #define HCORE_LOG_IS_INTERNAL(log_file) ((log_file)[0] == '@')
 
 /**
- * @brief  将日志字符串转化为对应的整型值，支持：'emerg', 'alert', 'crit',
- * 'error', 'warn', 'notice', 'info', 'debug'
+ * @brief  Convert log string to the corresponding integer value,
+ * support: 'emerg', 'alert', 'crit', 'error', 'warn', 'notice', 'info',
+ * 'debug';
+ *
  * @note
- * @param  *log_str:
- * @retval
- * 解析成功：返回对应的整形值，比如宏 "HCORE_LOG_ERROR"
- * 解析失败：HCORE_ERROR
+ *
+ * @param log_str: log string
+ *
+ * @retval * Upon successful completion, the function shall return the
+ * corresponding integer value, such as macro "HCORE_LOG_ERROR", otherwise, the
+ * function shall return HCORE_ERROR.
  */
 hcore_int_t hcore_log_parse_level(const char *log_str);
 
 /**
- * @brief  将'text'输出到标准错误
+ * @brief  Output the text to STDERR
+ *
  * @note
- * @param  *text:
- * @retval
+ *
+ * @param text: text to output
+ *
+ * @retval void
  */
 static inline void
 hcore_write_stderr(char *text)
@@ -117,10 +145,13 @@ hcore_write_stderr(char *text)
 }
 
 /**
- * @brief  将'text'输出到标准输出
+ * @brief  Output the text to STDOUT
+ *
  * @note
- * @param  *text:
- * @retval
+ *
+ * @param  text: text to output
+ *
+ * @retval void
  */
 static inline void
 hcore_write_stdout(char *text)
@@ -164,12 +195,14 @@ hcore_log_t *hcore_create_log(hcore_pool_t *pool, char *log_file,
 void hcore_destroy_log(hcore_log_t *log);
 
 /**
- * @brief  open log by log_file
+ * @brief  Open a log file
+ * e
  * @note
- * @param  *log:
- * @param  *log_file:
- * @param  level:
- * @retval
+ * @param  log : log object
+ * @param  log_file: log file path
+ * @param  level: log level
+ *
+ * @retval Upon successful return 'HCORE_OK', otherwise return 'HCORE_ERROR'
  */
 hcore_int_t hcore_open_log(hcore_log_t *log, char *log_file, hcore_int_t level);
 

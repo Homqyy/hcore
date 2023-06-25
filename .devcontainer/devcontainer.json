@@ -25,7 +25,10 @@
 		"cschlosser.doxdocgen",
 		"oderwat.indent-rainbow",
 		"jeff-hykin.better-cpp-syntax",
-		"shd101wyy.markdown-preview-enhanced"
+		"shd101wyy.markdown-preview-enhanced",
+		"GitHub.copilot-labs",
+		"GitHub.copilot-nightly",
+		"ms-vscode.live-server"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -36,7 +39,7 @@
 
 	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
 	"runArgs": [ 
-		"--cap-add=SYS_PTRACE",
+		"--cap-add=SYS_PTACE",
 		"--security-opt", 
 		"seccomp=unconfined"
 	],
