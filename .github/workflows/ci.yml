@@ -33,4 +33,11 @@ jobs:
 
     - name: Test
       run: ./build.sh test
-
+      
+    - name: Commit and push build number
+      run: |
+        git config --local user.email "yilupiaoxuewhq@163.com"
+        git config --local user.name "GitHub Action"
+        git add .build_number .gcmake/.version
+        git commit -m "Update .build_number and .version [skip ci]"
+        git push origin HEAD:master
