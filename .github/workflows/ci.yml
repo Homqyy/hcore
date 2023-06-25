@@ -1,4 +1,4 @@
-name: hcore-release
+name: hcore-ci
 
 on:
   push:
@@ -26,11 +26,11 @@ jobs:
       run: git submodule update --init --recursive
 
     - name: Configure CMake
-      run: ./build.sh -n configure
+      run: ./build.sh configure
 
     - name: Compile
-      run: ./build.sh -n compile
+      run: ./build.sh compile
 
     - name: Test
-      run: ./build.sh -n test
+      run: ./build.sh test
 
