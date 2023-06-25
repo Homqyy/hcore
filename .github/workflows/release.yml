@@ -20,7 +20,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: .
-        dockerfile: Dockerfile
+        file: Dockerfile
 
     - name: Update submodules
       run: git submodule update --init --recursive
