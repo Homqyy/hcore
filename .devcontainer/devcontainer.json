@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.231.6/containers/docker-existing-dockerfile
 {
-	"name": "Existing Dockerfile",
+	"name": "hcore",
 
 	// Sets the run context to one level up instead of the .devcontainer folder.
 	"context": "..",
@@ -35,7 +35,11 @@
 	// "postCreateCommand": "apt-get update && apt-get install -y curl",
 
 	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
-	// "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+	"runArgs": [ 
+		"--cap-add=SYS_PTRACE",
+		"--security-opt", 
+		"seccomp=unconfined"
+	],
 
 	// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
 	// "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],

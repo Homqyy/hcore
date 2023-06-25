@@ -10,10 +10,10 @@ USER root
 # install clang-format
 RUN curl https://copr.fedorainfracloud.org/coprs/carlwgeorge/ripgrep/repo/epel-7/carlwgeorge-ripgrep-epel-7.repo \
         > /etc/yum.repos.d/carlwgeorge-ripgrep-epel-7.repo \
-    && yum -y install ripgrep git-clang-format
+    && yum -y install ripgrep git-clang-format sudo
 
 RUN groupadd -g $GROUP hcore \
-    && useradd -g $GROUP -u $USER hcore
+    && useradd -g $GROUP -u $USER -p "" hcore
 
 USER $USER:$GROUP
 
