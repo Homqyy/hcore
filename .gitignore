@@ -4,4 +4,5 @@ debug
 packages
 .vstags
 CMakeLists.txt
+!docs/example/CMakeLists.txt
 Testing
