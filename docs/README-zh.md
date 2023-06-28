@@ -68,21 +68,31 @@ hcore
 
 ### 日志(hcore_log)
 
+日志文件：[hcore_log.h](./include/hcore_log.h)
+
 用于记录程序日志的日志接口。支持常见的8个日志级别，且能够用`_HCORE_DEBUG`去控制调试日志是否编译到程序中，以区分调试版本和正式版本。
 
-#### 日志级别
+支持的日志级别从高到低分别为：
 
-- HCORE_LOG_STDERR 0
-- HCORE_LOG_EMERG  1
-- HCORE_LOG_ALERT  2
-- HCORE_LOG_CRIT   3
-- HCORE_LOG_ERR    4
-- HCORE_LOG_WARN   5
-- HCORE_LOG_NOTICE 6
-- HCORE_LOG_INFO   7
-- HCORE_LOG_DEBUG  8
-- HCORE_LOG_UNSET  ((hcore_uint_t)-1)
+- 标准错误（Standard Error）
+- 严重（Emergency）
+- 警报（Alert）
+- 危险的（Critical）
+- 错误（Error）
+- 警告（Warning）
+- 通知（Notice）
+- 信息（Informational）
+- 调试（Debug）
 
 #### 示例
 
-待完善
+[example/e_log.c](./example/hcore_log.c)
+
+运行后可以在`/var/log/myqpp.log`中看到与下方类似的日志内容：
+
+```text
+2023/06/28 10:29:22 -0000 UTC [ debug] 12417 unknown: (0) This is a debug message.
+2023/06/28 10:29:22 -0000 UTC [  warn] 12417 unknown: (0) This is a warning message.
+2023/06/28 10:29:22 -0000 UTC [ error] 12417 unknown: (0) This is an error message.
+2023/06/28 10:29:22 -0000 UTC [ debug] 12417 unknown: (0) run cleanup: 0000000001DA8390
+```
