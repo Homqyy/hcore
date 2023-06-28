@@ -28,7 +28,8 @@
 		"shd101wyy.markdown-preview-enhanced",
 		"GitHub.copilot-labs",
 		"GitHub.copilot-nightly",
-		"ms-vscode.live-server"
+		"ms-vscode.live-server",
+		"GitHub.vscode-github-actions"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
