@@ -53,6 +53,9 @@ else()
     target_compile_options(hcore PRIVATE -O2)
 endif()
 
+# example
+add_subdirectory(docs/example)
+
 # Test
 enable_testing()
 
@@ -64,6 +67,11 @@ aux_source_directory(tests TEST_SOURCE)
 add_executable(test_all ${TEST_SOURCE})
 target_include_directories(test_all PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(test_all PRIVATE GTest::gtest_main hcore)
+
+if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    target_compile_definitions(test_all PRIVATE NDEBUG)
+endif()
+
 gtest_discover_tests(test_all)
 
 # Package
