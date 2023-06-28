@@ -44,20 +44,20 @@ class ShmtxTest : public ::testing::Test {
 };
 
 static void
-wait_next(hcore_log_t *log, const hcore_uint_t * const n, hcore_uint_t expected)
+wait_next(hcore_log_t *log, hcore_atomic_t *n, hcore_atomic_t expected)
 {
     hcore_log_error(HCORE_LOG_INFO, log, 0, "wait %ud and now is %ud", expected, *n);
 
-    while (*n != expected)
+    while (hcore_atomic_fetch(n) != expected)
     {
         usleep(1000); /* 1 ms */
     }
 }
 
 static void
-notify_next(hcore_log_t *log, hcore_uint_t *n)
+notify_next(hcore_log_t *log, hcore_atomic_t *n)
 {
-    (*n)++;
+    hcore_atomic_increase(n);
 
     hcore_log_error(HCORE_LOG_INFO, log, 0, "notify next to %ud", *n);
 }
@@ -155,8 +155,8 @@ TEST_F(ShmtxTest, unlock)
     // 3. Unlock a shared mutex that is locked by another process.
 
     hcore_pid_t pid = fork();
-    hcore_uint_t *n = (hcore_uint_t *)hcore_shpool_calloc(fShpoolAnonymity,
-                                                         sizeof(hcore_uint_t));
+    hcore_atomic_t *n = (hcore_atomic_t *)hcore_shpool_calloc(fShpoolAnonymity,
+                                                         sizeof(hcore_atomic_t));
 
     hcore_log_error(HCORE_LOG_INFO, &fLog, 0, "pid: %d", pid);
 
@@ -230,8 +230,8 @@ TEST_F(ShmtxTest, forceUnlock)
     // 3. Force unlock a shared mutex that is locked by another process.
 
     hcore_pid_t pid = fork();
-    hcore_uint_t *n = (hcore_uint_t *)hcore_shpool_calloc(fShpoolAnonymity,
-                                                         sizeof(hcore_uint_t));
+    hcore_atomic_t *n = (hcore_atomic_t *)hcore_shpool_calloc(fShpoolAnonymity,
+                                                         sizeof(hcore_atomic_t));
 
     if (pid == 0)
     {
@@ -275,8 +275,8 @@ TEST_F(ShmtxTest, lockInMultiprocess)
     hcore_pid_t pid = fork();
 
     // create a shared variable to synchronize the two processes.
-    hcore_uint_t *n = (hcore_uint_t *)hcore_shpool_calloc(fShpoolAnonymity,
-                                                         sizeof(hcore_uint_t));
+    hcore_atomic_t *n = (hcore_atomic_t *)hcore_shpool_calloc(fShpoolAnonymity,
+                                                         sizeof(hcore_atomic_t));
 
     if (pid == 0)
     {

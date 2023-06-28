@@ -187,8 +187,7 @@ hcore_atomic_cmp_set(hcore_atomic_t *lock, hcore_atomic_uint_t old,
  * The "+r" is any register, %rax (%r0) - %r16.
  * The "cc" means that flags were changed.
  */
-
-static inline hcore_atomic_int_t
+static inline hcore_atomic_t
 hcore_atomic_fetch_add(hcore_atomic_t *value, hcore_atomic_int_t add)
 {
     __asm__ volatile(
@@ -200,6 +199,42 @@ hcore_atomic_fetch_add(hcore_atomic_t *value, hcore_atomic_int_t add)
         : "cc", "memory");
 
     return add;
+}
+
+/*
+ * "movq  r, [m]":
+ *
+ *    r = [m];
+ *
+ *
+ * The "r" is any register, %rax (%r0) - %r16.
+ * The "m" is a memory location.
+ */
+static inline hcore_atomic_uint_t
+hcore_atomic_fetch(hcore_atomic_t *value)
+{
+    return __atomic_load_n(value, __ATOMIC_SEQ_CST);
+}
+
+/*
+ * "incl  [m]":
+ *
+ *    [m] += 1;
+ *
+ *
+ * The "m" is a memory location.
+ * The "cc" means that flags were changed.
+ */
+static inline void
+hcore_atomic_increase(hcore_atomic_t *value)
+{
+    __asm__ volatile(
+
+        HCORE_SMP_LOCK "    incl  %0;   "
+
+        : "+m"(*value)
+        :
+        : "cc", "memory");
 }
 
 #endif // (HCORE_HAVE_AUTOMIC_OPS)
