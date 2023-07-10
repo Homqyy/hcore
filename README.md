@@ -1,6 +1,8 @@
 # HCore {#mainpage}
 ===============================
 
+For Chinese, please refer to [README-zh.md](./README-zh.md)
+
 ## Introduction
 
 This is a high-performance C interface library.
