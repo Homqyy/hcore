@@ -86,7 +86,7 @@ The supported logging levels from high to low are:
 
 #### Example
 
-[docs/example/e_log.c](./docs/example/hcore_log.c)
+[docs/example/e_log.c](./docs/example/e_log.c)
 
 After running, you can see log content similar to the following in `/var/log/myapp.log`:
 

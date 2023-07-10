@@ -86,7 +86,7 @@ hcore
 
 #### 示例
 
-[docs/example/e_log.c](./docs/example/hcore_log.c)
+[docs/example/e_log.c](./docs/example/e_log.c)
 
 运行后可以在`/var/log/myqpp.log`中看到与下方类似的日志内容：
 
@@ -97,3 +97,16 @@ hcore
 2023/06/28 10:29:22 -0000 UTC [ debug] 12417 unknown: (0) run cleanup: 0000000001DA8390
 ```
 
+### 内存池(hcore_pool)
+
+内存池文件：[hcore_pool.h](./include/hcore_pool.h)
+
+内存池是一种内存管理机制，它可以在内存中分配一块连续的内存空间，然后按需分配给程序使用。内存池的好处是可以减少内存碎片，提高内存的利用率。
+
+#### 示例
+
+[docs/example/e_pool.c]
+
+## 接口性能
+
+待完善
