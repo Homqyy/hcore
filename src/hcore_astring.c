@@ -16,6 +16,36 @@
 #include <hcore_string.h>
 
 hcore_int_t
+hcore_astrfmt_size(hcore_astring_t *astr, ssize_t size)
+{
+    const char  *units[] = {"B", "KB", "MB", "GB", "TB", NULL};
+    const char **pu;
+    ssize_t      scale, v;
+    double       decimal;
+    double       r; // remainder
+
+    pu    = units;
+    v     = size;
+    scale = 1;
+
+    while (v)
+    {
+        if (!(v >> 10)) break;
+
+        pu++;
+        scale <<= 10;
+        v >>= 10;
+    }
+
+    r = size & (scale - 1);
+
+    decimal = r / scale;
+    decimal += v;
+
+    return hcore_asnprintf(astr, "%.02f %s", decimal, *pu);
+}
+
+hcore_int_t
 hcore_asnprintf(hcore_astring_t *astr, const char *fmt, ...)
 {
     hcore_assert(astr);

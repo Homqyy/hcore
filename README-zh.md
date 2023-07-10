@@ -1,5 +1,5 @@
 HCore               {#mainpage}
-==========
+===============================
 
 ## 介绍
 
@@ -86,7 +86,7 @@ hcore
 
 #### 示例
 
-[example/e_log.c](./example/hcore_log.c)
+[docs/example/e_log.c](./docs/example/hcore_log.c)
 
 运行后可以在`/var/log/myqpp.log`中看到与下方类似的日志内容：
 
@@ -96,3 +96,4 @@ hcore
 2023/06/28 10:29:22 -0000 UTC [ error] 12417 unknown: (0) This is an error message.
 2023/06/28 10:29:22 -0000 UTC [ debug] 12417 unknown: (0) run cleanup: 0000000001DA8390
 ```
+

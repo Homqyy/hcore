@@ -16,6 +16,7 @@
 #include <hcore_base.h>
 #include <hcore_debug.h>
 #include <hcore_string.h>
+#include <hcore_astring.h>
 
 #include <execinfo.h>
 #include <stdio.h>
@@ -24,6 +25,76 @@
 static hcore_debug_t *g_hcore_debug;
 
 static int hcore_debug_mnode_cmp(const void *p1, const void *p2);
+
+
+void
+hcore_debug_dump_memory_leak_info(hcore_log_t *log)
+{
+    hcore_debug_t *db = hcore_get_debug();
+    hcore_int_t    i, j;
+    unsigned int   num;
+
+    hcore_assert(db);
+
+    if (db == NULL) return;
+
+    hcore_astring_t *astr = hcore_create_astring(65536, realloc, free);
+
+    if (astr == NULL) return;
+
+    num = HCORE_LIST_NUM(db->mlist);
+
+    if (db->alloced_num != db->free_num)
+    {
+        hcore_asnprintf(astr, "\nHave a memory leak!!!\n");
+        hcore_asnprintf(astr, "\nHave a memory leak!!!\n");
+        hcore_asnprintf(astr, "\nHave a memory leak!!!\n");
+    }
+
+    hcore_asnprintf(astr, "\n##### Memory Leak Information #####\n");
+    hcore_asnprintf(astr, "#\n");
+
+    hcore_asnprintf(astr, "# Leak Node Number       : %ud\n", num);
+
+    hcore_asnprintf(astr, "# Leak Memory Size       : ");
+    hcore_astrfmt_size(astr, db->total_alloced_size - db->total_free_size);
+    hcore_asnprintf(astr, "\n");
+
+    hcore_asnprintf(astr, "#\n");
+    hcore_asnprintf(astr, "# Allocated Node Number  : %uL\n", db->alloced_num);
+
+    hcore_asnprintf(astr, "# Allocated Memory Size  : ");
+    hcore_astrfmt_size(astr, db->total_alloced_size);
+    hcore_asnprintf(astr, "\n");
+
+    hcore_asnprintf(astr, "# Free Node Number       : %uL\n", db->free_num);
+    hcore_asnprintf(astr, "# Free Memory Size       : ");
+    hcore_astrfmt_size(astr, db->total_free_size);
+    hcore_asnprintf(astr, "\n");
+
+    hcore_asnprintf(astr, "#\n");
+    hcore_asnprintf(astr, "##################################\n");
+
+    for (i = 0; i < num; i++)
+    {
+        hcore_debug_mnode_t *node = db->mlist->p[i];
+
+        HCORE_DEBUG_ASSERT_MNODE(node);
+
+        hcore_asnprintf(astr, "Name: %s\n", node->name);
+        hcore_asnprintf(astr, "Size: %uz B\n", node->size);
+
+        for (j = 0; j < node->bt_num; j++)
+        {
+            hcore_asnprintf(astr, "    [%i] %s\n", j, node->bt_symbals[j]);
+        }
+    }
+
+    hcore_log_debug(log, 0, "%*s", hcore_astring_get_len(astr),
+                    hcore_astring_get_data(astr));
+
+    hcore_destroy_astring(astr);
+}
 
 hcore_uchar_t *
 hcore_debug_get_memory_leak_info(hcore_uchar_t *buf, size_t len)

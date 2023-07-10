@@ -26,15 +26,23 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
-static hcore_str_t g_hcore_err_levels[] = {
-    hcore_null_string,      hcore_string("emerg"), hcore_string("alert"),
-    hcore_string("crit"),   hcore_string("error"), hcore_string("warn"),
-    hcore_string("notice"), hcore_string("info"),  hcore_string("debug")};
+struct
+{
+    int         level;
+    hcore_str_t name;
+    hcore_str_t padding;
+} static g_hcore_log_level[] = {
+    {HCORE_LOG_STDERR, hcore_string("stderr"), hcore_string("")},
+    {HCORE_LOG_EMERG, hcore_string("emerg"), hcore_string(" ")},
+    {HCORE_LOG_ALERT, hcore_string("alert"), hcore_string(" ")},
+    {HCORE_LOG_CRIT, hcore_string("crit"), hcore_string("  ")},
+    {HCORE_LOG_ERR, hcore_string("error"), hcore_string(" ")},
+    {HCORE_LOG_WARN, hcore_string("warn"), hcore_string("  ")},
+    {HCORE_LOG_NOTICE, hcore_string("notice"), hcore_string("")},
+    {HCORE_LOG_INFO, hcore_string("info"), hcore_string("  ")},
+    {HCORE_LOG_DEBUG, hcore_string("debug"), hcore_string(" ")},
+};
 
-static hcore_str_t g_hcore_err_padding[] = {
-    hcore_string(""),   hcore_string(" "),  hcore_string(" "),
-    hcore_string("  "), hcore_string(" "),  hcore_string("  "),
-    hcore_string(""),   hcore_string("  "), hcore_string(" ")};
 
 hcore_int_t
 hcore_log_parse_level(const char *log_str)
@@ -47,12 +55,17 @@ hcore_log_parse_level(const char *log_str)
     int i;
     int len = strlen(log_str);
 
-    for (i = 1; i <= HCORE_LOG_DEBUG; i++)
+    if (len == 0)
     {
-        if (g_hcore_err_levels[i].len == len
-            && hcore_memcmp(g_hcore_err_levels[i].data, log_str, len) == 0)
+        return HCORE_ERROR;
+    }
+
+    for (i = 0; i < HCORE_ARRAY_NUM(g_hcore_log_level); i++)
+    {
+        if (g_hcore_log_level[i].name.len == len
+            && hcore_memcmp(g_hcore_log_level[i].name.data, log_str, len) == 0)
         {
-            return i;
+            return g_hcore_log_level[i].level;
         }
     }
 
@@ -67,10 +80,12 @@ hcore_log_error_core(int level, hcore_log_t *log, hcore_err_t err,
                      const char *fmt, ...)
 {
     hcore_uchar_t *p, *last;
-    hcore_uchar_t  errstr[HCORE_LOG_ERRSTR_LENGTH_MAX];
+    hcore_uchar_t  errstr[HCORE_LOG_ERRSTR_LENGTH_MAX] = {0};
     hcore_uchar_t  time[HCORE_LOG_TIME_LENGTH];
     char           errno_buf[64];
     va_list        args;
+
+    hcore_assert(HCORE_LOG_STDERR <= level && level <= HCORE_LOG_DEBUG);
 
     p    = errstr;
     last = errstr + HCORE_LOG_ERRSTR_LENGTH_MAX;
@@ -86,8 +101,8 @@ hcore_log_error_core(int level, hcore_log_t *log, hcore_err_t err,
 
     p = hcore_slprintf(p, last, "%s%Z", time);
 
-    p = hcore_slprintf(p, last, " [%V%V]", &g_hcore_err_padding[level],
-                       &g_hcore_err_levels[level]);
+    p = hcore_slprintf(p, last, " [%V%V]", &g_hcore_log_level[level].padding,
+                       &g_hcore_log_level[level].name);
 
     p = hcore_slprintf(p, last, " %5P", getpid());
 
@@ -95,12 +110,51 @@ hcore_log_error_core(int level, hcore_log_t *log, hcore_err_t err,
 
     if (err)
     {
+#ifdef _GNU_SOURCE
+        char *msg = strerror_r(err, errno_buf, sizeof(errno_buf));
+
+        if (msg == NULL)
+        {
+            if (errno == EINVAL)
+            {
+                hcore_memcpy(errno_buf, "parse error: INVAL",
+                             sizeof("parse error: INVAL"));
+            }
+            else if (errno == ERANGE)
+            {
+                hcore_memcpy(errno_buf, "parse error: RANGE",
+                             sizeof("parse error: RANGE"));
+            }
+            else
+            {
+                hcore_memcpy(errno_buf, "no parsed", sizeof("no parsed"));
+            }
+
+            msg = errno_buf;
+        }
+
+        p = hcore_slprintf(p, last, " (%d: %s) ", err, msg);
+#else
         if (strerror_r(err, errno_buf, sizeof(errno_buf)) != 0)
         {
-            hcore_memcpy(errno_buf, "no parsed", sizeof("no parsed"));
+            if (errno == EINVAL)
+            {
+                hcore_memcpy(errno_buf, "parse error: INVAL",
+                             sizeof("parse error: INVAL"));
+            }
+            else if (errno == ERANGE)
+            {
+                hcore_memcpy(errno_buf, "parse error: RANGE",
+                             sizeof("parse error: RANGE"));
+            }
+            else
+            {
+                hcore_memcpy(errno_buf, "no parsed", sizeof("no parsed"));
+            }
         }
 
         p = hcore_slprintf(p, last, " (%d: %s) ", err, errno_buf);
+#endif
     }
     else
     {
@@ -167,6 +221,8 @@ hcore_open_log(hcore_log_t *log, char *log_file, hcore_int_t level)
 
     int          fd       = -1;
     hcore_uint_t internal = 0;
+
+    if (level < HCORE_LOG_STDERR || level > HCORE_LOG_DEBUG) return HCORE_ERROR;
 
     if (strncmp(log_file, HCORE_LOG_FILE_STDOUT, sizeof(HCORE_LOG_FILE_STDOUT))
         == 0)

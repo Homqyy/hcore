@@ -6,7 +6,8 @@
                 "/usr/include/**",
                 "${workspaceFolder}/src/",
                 "${workspaceFolder}/include/",
-                "${workspaceFolder}/googletest/googletest/include"
+                "${workspaceFolder}/googletest/googletest/include",
+                "${workspaceFolder}/egoogletest/"
             ],
             "defines": [
                 "_HCORE_DEBUG"

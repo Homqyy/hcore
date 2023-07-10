@@ -48,6 +48,7 @@ typedef struct
  */
 
 hcore_int_t      hcore_asnprintf(hcore_astring_t *astr, const char *fmt, ...);
+hcore_int_t      hcore_astrfmt_size(hcore_astring_t *astr, ssize_t size);
 hcore_astring_t *hcore_create_astring(size_t size, astr_realloc_pt astr_realloc,
                                       astr_free_pt astr_free);
 hcore_int_t      hcore_init_astring(hcore_astring_t *astr, size_t size,

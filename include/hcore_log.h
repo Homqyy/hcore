@@ -21,8 +21,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#define HCORE_LOG_FILE_STDOUT "@STDOUT"
-#define HCORE_LOG_FILE_STDERR "@STDERR"
+#define HCORE_LOG_FILE_STDOUT ((char *)"@STDOUT")
+#define HCORE_LOG_FILE_STDERR ((char *)"@STDERR")
 
 /* 日志级别 */
 #define HCORE_LOG_STDERR 0
@@ -132,8 +132,6 @@ hcore_int_t hcore_log_parse_level(const char *log_str);
 /**
  * @brief  Output the text to STDERR
  *
- * @note
- *
  * @param text: text to output
  *
  * @retval void
@@ -146,12 +144,10 @@ hcore_write_stderr(char *text)
 
 /**
  * @brief  Output the text to STDOUT
- *
- * @note
- *
+ * 
  * @param  text: text to output
- *
- * @retval void
+ * 
+ * @retval None
  */
 static inline void
 hcore_write_stdout(char *text)
@@ -160,27 +156,32 @@ hcore_write_stdout(char *text)
 }
 
 /**
- * @brief  获取GMT的时间格式串，比如：2021/09/26 20:24:00 +0000 GMT
- * @note
- * @param  time[HCORE_LOG_TIME_LENGTH]: 用来存放时间格式串的地方
+ * @brief  Get the GMT time format string, such as: 2021/09/26 20:24:00 +0000 GMT
+ * 
+ * @note  The time is end with '\0'
+ * 
+ * @param  time[HCORE_LOG_TIME_LENGTH]: Used to store the time format string
+ * 
  * @retval None
  */
 void hcore_log_get_time(hcore_uchar_t time[HCORE_LOG_TIME_LENGTH]);
 
 /**
- * @brief  获取当前设备的时间格式串，比如：2021/09/26 20:24:00 +0800 CST
- * @note
- * @param  time[HCORE_LOG_TIME_LENGTH]: 用来存放时间格式串的地方
+ * @brief  Get the time format string of the current device, such as: 2021/09/26 20:24:00 +0800 CST 
+ * 
+ * @param  time[HCORE_LOG_TIME_LENGTH]: Used to store the time format string
+ * 
  * @retval None
  */
 void hcore_log_get_localtime(hcore_uchar_t time[HCORE_LOG_TIME_LENGTH]);
 
 /**
  * @brief  create a log
- * @note
+ * 
  * @param  *pool: pool
  * @param  *log_file: log file path
  * @param  level: log level
+ * 
  * @retval Upon successful return 'log', otherwise return 'NULL'
  */
 hcore_log_t *hcore_create_log(hcore_pool_t *pool, char *log_file,
@@ -188,15 +189,16 @@ hcore_log_t *hcore_create_log(hcore_pool_t *pool, char *log_file,
 
 /**
  * @brief  destroy the log
- * @note
+ * 
  * @param  *log: log
+ * 
  * @retval None
  */
 void hcore_destroy_log(hcore_log_t *log);
 
 /**
  * @brief  Open a log file
- * e
+ * 
  * @note
  * @param  log : log object
  * @param  log_file: log file path
