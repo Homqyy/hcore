@@ -89,7 +89,7 @@ hcore_getpagesize_shift(void)
     if (g_hcore_pagesize_shift == -1)
     {
         hcore_int_t n;
-        for (n = g_hcore_pagesize; n >>= 1; g_hcore_pagesize_shift++)
+        for (n = pagesize; n >>= 1; g_hcore_pagesize_shift++)
         {
             // nothing
         }
