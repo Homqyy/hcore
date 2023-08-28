@@ -73,7 +73,17 @@ typedef struct
  */
 hcore_shpool_t *hcore_create_shpool(hcore_log_t *log, const char *name,
                                     size_t size);
+
+/**
+ * @brief get a pool of shared memory
+ * 
+ * @param log log object
+ * @param name name of pool, it should be unique and constant.
+ * @return hcore_shpool_t* : Upon successful is return a pool object, otherwise
+ * return NULL.
+ */
 hcore_shpool_t *hcore_get_shpool(hcore_log_t *log, const char *name);
+
 /**
  * @brief destroy a pool object
  *
