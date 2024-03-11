@@ -37,7 +37,7 @@
  */
 #define HCORE_CLOSE_EVENT 0x01
 
-typedef int (*sde_event_get_debug_id_pt)(void *data);
+typedef int (*hcore_event_get_debug_id_pt)(void *data);
 typedef struct hcore_event_s hcore_event_t;
 
 typedef void (*hcore_event_handler_pt)(struct hcore_event_s *event);
@@ -51,7 +51,7 @@ struct hcore_event_s
     hcore_rbtree_node_t timer; // timer of event
 
     /* for debug */
-    sde_event_get_debug_id_pt get_id;
+    hcore_event_get_debug_id_pt get_id;
 
     /* status */
     hcore_uint_t error      : 1; // encounter a error

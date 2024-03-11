@@ -77,7 +77,7 @@ hcore_int_t  hcore_hextoi(hcore_uchar_t *line, size_t n);
  *
  * @param line string of size
  * @return ssize_t : Upon successful is return integer expression of string
- * 'line', otherwise return SDE_FAILE to meant error occur.
+ * 'line', otherwise return HCORE_ERROR to meant error occur.
  */
 ssize_t      hcore_parse_size(hcore_str_t *line);
 /**
@@ -86,7 +86,7 @@ ssize_t      hcore_parse_size(hcore_str_t *line);
  * <master>, <minor> and <patch> must in [1, 255]. prefix 'v' or 'V' is option.
  *
  * @param line string of version
- * @return sde_uint_t Upon successful is return integer expression of version
+ * @return hcore_uint_t Upon successful is return integer expression of version
  * string, otherwise return 0.
  */
 hcore_uint_t hcore_parse_version(hcore_str_t *line);
